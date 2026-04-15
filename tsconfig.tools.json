@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "eslint.config.ts",
+    "vitest.config.ts",
+    "packages/*/build.config.ts"
+  ]
+}
