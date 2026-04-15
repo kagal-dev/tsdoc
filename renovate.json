@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "groupName": "Nuxt.js",
+      "groupSlug": "nuxt",
+      "matchPackageNames": [
+        "@nuxt/**",
+        "@nuxtjs/**",
+        "nuxt",
+        "nuxi",
+        "/^nuxt-.*$/"
+      ]
+    }, {
+      "groupName": "eslint dependencies",
+      "groupSlug": "eslint",
+      "matchPackageNames": [
+        "/eslint/"
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "pnpmDedupe"
+  ],
+  "rangeStrategy": "bump"
+}

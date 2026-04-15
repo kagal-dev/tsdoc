@@ -1,0 +1,29 @@
+name: Build
+on:
+  push:
+    branches-ignore:
+      - '**-wip'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    # Pull requests from the same repository won't trigger this checks as they were already triggered by the push
+    if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+      - name: pnpm precommit
+        run: pnpm precommit
+      - name: publish preview
+        if: github.event_name == 'pull_request' || github.repository == 'kagal-dev/tsdoc'
+        run: pnpm pkg-pr-new publish --package-manager=pnpm --pnpm packages/@kagal-*
