@@ -40,7 +40,7 @@ Per-package commands via `--filter`:
 
 ```bash
 pnpm --filter @kagal/build-tsdoc build
-pnpm --filter @kagal/nuxt-tsdoc test
+pnpm --filter @kagal/build-tsdoc test
 ```
 
 ## Licence

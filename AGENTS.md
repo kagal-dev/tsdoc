@@ -74,7 +74,7 @@ Per-package commands via `--filter`:
 
 ```bash
 pnpm --filter @kagal/build-tsdoc build
-pnpm --filter @kagal/nuxt-tsdoc test
+pnpm --filter @kagal/build-tsdoc test
 ```
 
 ## Code Style Guidelines
@@ -242,6 +242,13 @@ options (ESNext, bundler resolution, strict mode).
 - `prepare` script: `cross-test -s dist/index.mjs ||
   unbuild --stub` (conditional stubbing)
 - `dev:prepare`: `unbuild --stub` (unconditional)
+- `@kagal/build-tsdoc` dogfoods itself: its
+  `build.config.ts` registers `newDocumentsHook()`,
+  so every build produces `_docs/api.json` alongside
+  `dist/`. The config imports from `./src/index` —
+  jiti resolves TS sources at config-load time, and
+  stub mode short-circuits the hook so `dev:prepare`
+  never needs a built dist.
 
 ## Publishing
 
