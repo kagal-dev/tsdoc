@@ -105,6 +105,43 @@ conventions):
 Prefer `new` or `make` prefix, not `create`
 (e.g. `newFoo()`, `makeFoo()`).
 
+### Handling cspell findings
+
+`pnpm lint` runs `cspell` against the tree using
+`internal/build/cspell.json`. When cspell flags a
+word, prefer fixing over whitelisting:
+
+- US spelling → British equivalent.
+- Concatenated compound → hyphenate so cspell sees
+  the dictionary parts.
+- Inconsistent identifier → harmonise to the
+  canonical form already used elsewhere in the
+  codebase.
+
+If the word is genuinely correct (brand, package
+name, RFC term, our own type name, or real English
+missing from cspell's dictionary), whitelist it at
+the right scope:
+
+- **Single file** — `cspell:words` for *named terms*
+  you want recognised across the file, placed near
+  the section heading or docstring it applies to;
+  `cspell:disable-next-line` for *opaque literals*
+  (test-vector strings, fixture filenames) where
+  naming the substring would just be noise.
+- **Multi-file** — promote to `words` in
+  `internal/build/cspell.json`.
+- **Comment-less format** (JSON, etc.) — extend the
+  `overrides` block in `internal/build/cspell.json`
+  with a per-filename rule so the term stays
+  file-scoped without polluting the global list.
+
+Don't put `cspell:disable-next-line` directly above
+a TSDoc/JSDoc comment — use `cspell:words` for the
+specific term. Don't break tables or bullet lists
+with inline annotations; place directives at the
+preceding section heading.
+
 ## Development Practices
 
 ### Pre-commit (MANDATORY)
@@ -189,6 +226,7 @@ Each package has multiple tsconfig files:
 The root `tsconfig.json` provides shared compiler
 options (ESNext, bundler resolution, strict mode).
 
+<!-- cspell:words workerd -->
 ## Testing
 
 - All packages use Vitest
@@ -220,6 +258,7 @@ No tokens stored as secrets.
 4. `pkg-pr-new` provides preview publishes on non-tag
    pushes
 
+<!-- cspell:words npmjs -->
 ### Setup (per package on npmjs.com)
 
 Each `@kagal/*` package must be configured as a
