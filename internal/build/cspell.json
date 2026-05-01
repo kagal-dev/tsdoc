@@ -1,0 +1,25 @@
+{
+  "version": "0.2",
+  "language": "en-GB",
+  "ignorePaths": [
+    "**/pnpm-lock.yaml",
+    "**/cspell.json"
+  ],
+  "words": [
+    "apptly",
+    "kagal",
+    "poupe",
+    "prepack",
+    "tsdoc",
+    "unbuild"
+  ],
+  "overrides": [
+    {
+      "filename": "**/renovate.json",
+      "words": [
+        "nuxi",
+        "nuxtjs"
+      ]
+    }
+  ]
+}
