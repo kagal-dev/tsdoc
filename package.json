@@ -20,6 +20,7 @@
     "precommit": "run-s dev:prepare lint type-check build test",
     "prepack": "run-s lint:root:check && pnpm -r prepack",
     "test": "pnpm -r test",
+    "test:compat": "pnpm -r test:compat",
     "test:coverage": "pnpm -r test:coverage",
     "type-check": "run-s type-check:root type-check:packages",
     "type-check:packages": "pnpm -r type-check",
