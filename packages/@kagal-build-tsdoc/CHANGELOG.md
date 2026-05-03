@@ -5,7 +5,15 @@ documented in this file.
 
 ## [Unreleased]
 
-<!-- cspell:words tsdocs -->
+## [0.1.0] - 2026-05-03
+
+<!-- cspell:words Sigstore tsdocs -->
+First release published via npm OIDC trusted publishing
+with Sigstore provenance. Version `0.0.1` was a manual
+bootstrap publish needed to register the package on npm
+so the trusted-publisher binding could be configured;
+its contents are otherwise identical to `0.1.0`.
+
 ### Changed
 
 - Migrated from `kagal-dev/pki` monorepo, where the

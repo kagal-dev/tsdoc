@@ -1,6 +1,6 @@
 {
   "name": "@kagal/build-tsdoc",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "description": "TSDoc extraction hook for unbuild",
   "author": "Alejandro Mery <amery@apptly.co>",

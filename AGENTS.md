@@ -256,9 +256,14 @@ npm packages are published via GitHub Actions using
 npm's OIDC trusted publishing with `--provenance`.
 No tokens stored as secrets.
 
-1. Push a version tag matching `v[0-9]*` or
-   `**/v[0-9]*` (per-package tags) to trigger
-   `publish.yml`
+1. Push a version tag to trigger `publish.yml`. Two
+   patterns are accepted:
+   - `v[0-9]*` — repo-wide release (e.g. `v0.1.0`),
+     suitable when every publishable package shares
+     a version
+   - `@*/*@[0-9]*` — per-package release in the
+     standard npm form `@scope/name@version`
+     (e.g. `@kagal/build-tsdoc@0.1.0`)
 2. GitHub Actions authenticates to npm via OIDC
 3. `pnpm -r publish:maybe` checks each package —
    publishes only if `$name@$version` is not yet on npm
