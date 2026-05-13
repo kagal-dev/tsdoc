@@ -70,7 +70,7 @@
     "vitest": "^4.1.4"
   },
   "peerDependencies": {
-    "unbuild": ">=3.5.0"
+    "unbuild": ">=3.6.1"
   },
   "engines": {
     "node": ">= 20.20.1",
