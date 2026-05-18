@@ -54,7 +54,7 @@
     "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
   },
   "dependencies": {
-    "tsdoc-markdown": "^1.4.1"
+    "tsdoc-markdown": "^1.5.0"
   },
   "devDependencies": {
     "@kagal/cross-test": "^0.1.3",
