@@ -256,19 +256,23 @@ npm packages are published via GitHub Actions using
 npm's OIDC trusted publishing with `--provenance`.
 No tokens stored as secrets.
 
-1. Push a version tag to trigger `publish.yml`. Two
-   patterns are accepted:
-   - `v[0-9]*` — repo-wide release (e.g. `v0.1.0`),
-     suitable when every publishable package shares
-     a version
-   - `@*/*@[0-9]*` — per-package release in the
-     standard npm form `@scope/name@version`
-     (e.g. `@kagal/build-tsdoc@0.1.0`)
+1. Push a per-package tag in the standard npm form
+   `@scope/name@version` (e.g.
+   `@kagal/build-tsdoc@0.1.0`) to trigger
+   `publish.yml`. The tag name is matched by
+   `@*/*@[0-9]*`.
 2. GitHub Actions authenticates to npm via OIDC
-3. `pnpm -r publish:maybe` checks each package —
-   publishes only if `$name@$version` is not yet on npm
-4. `pkg-pr-new` provides preview publishes on non-tag
-   pushes
+3. The workflow extracts the package name from the
+   tag and runs
+   `pnpm --filter <name> publish:maybe`, which
+   publishes the package only if `$name@$version`
+   is not yet on npm
+4. Independent package tags release concurrently —
+   the workflow's concurrency group is per-ref, so
+   one package's release does not queue behind
+   another
+5. `pkg-pr-new` provides preview publishes on
+   non-tag pushes
 
 <!-- cspell:words npmjs -->
 ### Setup (per package on npmjs.com)
