@@ -1,62 +1,75 @@
 # @kagal/build-tsdoc
 
-TSDoc extraction hook for unbuild. Extracts documented
-symbols from each entry point at build time and writes
-per-export `api_<name>.json` files plus a unified
-`api.json` manifest.
+Build-hook adapter for `@microsoft/api-extractor`.
+Slim wrapper with `dist/<entryName>.*` defaults and a
+stub-aware skip so the call is safe from any
+`build:done` / `end` / similar hook.
 
 ## Usage
 
 ```typescript
-import { newDocumentsHook } from '@kagal/build-tsdoc';
 import { defineBuildConfig } from 'unbuild';
+import { extractEntryManifest } from '@kagal/build-tsdoc';
 
 export default defineBuildConfig({
-  entries: [
-    { input: 'src/index', name: 'index' },
-    { input: 'src/types/index', name: 'types' },
-    { input: 'src/schema/index', name: 'schema' },
-  ],
+  entries: [{ input: 'src/index', name: 'index' }],
+  declaration: true,
   hooks: {
-    'build:done': newDocumentsHook(),
+    'build:done'(context) {
+      if (context.options.stub) return;
+      for (const entry of context.options.entries) {
+        extractEntryManifest({
+          projectFolder: context.options.rootDir,
+          entryName: entry.name,
+        });
+      }
+    },
   },
 });
 ```
 
-By default, output goes to `_docs/` at the package root
-(not inside `dist/`, so it does not ship to npm). To
-override:
+Each call writes
+`<projectFolder>/dist/<entryName>.api.json` in
+`@microsoft/api-extractor-model`'s wire format, loadable
+with `ApiPackage.loadFromJsonFile()`.
 
-```typescript
-newDocumentsHook({ outputDirectory: 'docs/api' })
-```
+## Defaults
 
-## Output
+Paths derive from `projectFolder`, `outDir`, and
+`entryName`:
 
-For a package with `index`, `types`, and `schema`
-entries:
+| Option | Default |
+| --- | --- |
+| `outDir` | `dist`, resolved against `<projectFolder>` |
+| `entryFile` | `<outDir>/<entryName>.d.mts` |
+| `outputPath` | `<outDir>/<entryName>.api.json` |
+| `tsconfigPath` | `<projectFolder>/tsconfig.json` |
+| `packageFullPath` | `<projectFolder>/package.json` |
 
-```text
-_docs/
-  api.json          # unified manifest
-  api_index.json    # symbols from src/index
-  api_types.json    # symbols from src/types/index
-  api_schema.json   # symbols from src/schema/index
-```
+Override any of them individually for non-standard
+layouts.
 
-Per-export files each contain a `DocEntry[]` array from
-`tsdoc-markdown`. The unified `api.json` manifest wraps
-them with package name, version, generation timestamp,
-and per-export metadata. The `api_` prefix on per-export
-files keeps them in a separate filename namespace from
-the manifest, so packages whose exports include `./api`
-do not collide with `api.json`.
+## Behaviour
+
+- Returns `undefined` when `entryFile` is missing — stub
+  builds emit only the JS bundle, no declarations, so
+  the call is safe to make unconditionally.
+- Runtime dependencies are passed to api-extractor as
+  `bundledPackages`: a symbol re-exported from a
+  dependency is part of the package contract, so it is
+  documented as a member of the package itself.
+  Dependencies the entry never references are a no-op.
+- Throws when api-extractor reports any error. Warnings
+  surface in the returned `warningCount`.
+- Collision detection over the entry list is the
+  caller's responsibility — only the caller knows the
+  entry-name to output-filename mapping.
 
 ## Exports
 
-| Export | Description | Deps |
-|--------|-------------|------|
-| `@kagal/build-tsdoc` | `newDocumentsHook()`, `DEFAULT_OUTPUT_DIRECTORY`, types, `VERSION` | tsdoc-markdown, unbuild (peer) |
+| Export | Description |
+| --- | --- |
+| `@kagal/build-tsdoc` | `extractEntryManifest`, `ExtractEntryOptions`, `ExtractEntryResult`, `VERSION` |
 
 ## Licence
 

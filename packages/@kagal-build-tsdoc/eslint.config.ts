@@ -6,7 +6,7 @@ import {
 
 const config: Config[] = defineConfig(
   {
-    ignores: ['_docs', 'coverage'],
+    ignores: ['coverage'],
   },
   withAbbreviations(['dir', 'doc', 'docs']),
 );

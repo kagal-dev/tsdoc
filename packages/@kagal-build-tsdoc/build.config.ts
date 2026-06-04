@@ -1,6 +1,6 @@
 import { defineBuildConfig } from 'unbuild';
 
-import { newDocumentsHook } from './src/index';
+import { extractEntryManifest } from './src/index';
 
 export default defineBuildConfig({
   entries: [
@@ -9,6 +9,14 @@ export default defineBuildConfig({
   declaration: true,
   sourcemap: true,
   hooks: {
-    'build:done': newDocumentsHook(),
+    'build:done'(context) {
+      if (context.options.stub) return;
+      for (const entry of context.options.entries) {
+        extractEntryManifest({
+          projectFolder: context.options.rootDir,
+          entryName: entry.name,
+        });
+      }
+    },
   },
 });

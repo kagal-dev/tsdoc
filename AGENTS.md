@@ -10,12 +10,15 @@ This monorepo contains two MIT-licensed TypeScript
 packages for extracting and consuming TSDoc
 documentation:
 
-- **`@kagal/build-tsdoc`** — TSDoc extraction hook for
-  unbuild. Writes per-export JSON plus a unified
-  `api.json` manifest to `_docs/` at package build
-  time.
+- **`@kagal/build-tsdoc`** — build-hook adapter for
+  `@microsoft/api-extractor`. Thin wrapper with
+  `dist/<entryName>.*` defaults and a stub-aware skip.
+  Callers invoke `extractEntryManifest()` per entry
+  from their own `build:done` / `end` / similar hook,
+  which writes a standard `<entryName>.api.json` next
+  to the rolled declarations.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
-  `api.json` manifests in Nuxt applications.
+  `*.api.json` manifests in Nuxt applications.
 
 The packages form a strict one-way pipeline:
 
@@ -23,15 +26,15 @@ The packages form a strict one-way pipeline:
 package source (*.ts)
       │ extracted by
       ▼
-@kagal/build-tsdoc (unbuild hook) → _docs/api.json
+@kagal/build-tsdoc → dist/<entry>.api.json
       │ consumed by
       ▼
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
 ```
 
-`@kagal/build-tsdoc` has no runtime knowledge of Nuxt.
-`@kagal/nuxt-tsdoc` depends on `@kagal/build-tsdoc` only
-for shared types.
+`@kagal/build-tsdoc` has no runtime knowledge of Nuxt
+or any specific bundler. `@kagal/nuxt-tsdoc` depends on
+`@microsoft/api-extractor-model` to load the manifests.
 
 ## Monorepo Structure
 
@@ -40,10 +43,8 @@ tsdoc/
 ├── packages/
 │   ├── @kagal-build-tsdoc/    # @kagal/build-tsdoc
 │   │   └── src/
-│   │       ├── index.ts       # newDocumentsHook(), VERSION
-│   │       ├── types.ts       # Manifest types, DocEntry re-export
-│   │       ├── extract.ts     # Symbol extraction logic
-│   │       └── write.ts       # JSON output and logging
+│   │       ├── index.ts       # extractEntryManifest re-export, VERSION
+│   │       └── extract.ts     # api-extractor invocation + option types
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -243,12 +244,14 @@ options (ESNext, bundler resolution, strict mode).
   unbuild --stub` (conditional stubbing)
 - `dev:prepare`: `unbuild --stub` (unconditional)
 - `@kagal/build-tsdoc` dogfoods itself: its
-  `build.config.ts` registers `newDocumentsHook()`,
-  so every build produces `_docs/api.json` alongside
-  `dist/`. The config imports from `./src/index` —
-  jiti resolves TS sources at config-load time, and
-  stub mode short-circuits the hook so `dev:prepare`
-  never needs a built dist.
+  `build.config.ts` loops over its own entries in the
+  `build:done` hook and calls `extractEntryManifest()`
+  for each, so every build produces
+  `dist/<entry>.api.json` alongside the bundle. The
+  config imports from `./src/index` — jiti resolves
+  TS sources at config-load time, and the stub guard
+  short-circuits the hook so `dev:prepare` never needs
+  a built dist.
 
 ## Publishing
 

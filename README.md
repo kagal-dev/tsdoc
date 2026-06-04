@@ -7,13 +7,14 @@ Monorepo for TSDoc extraction and Nuxt consumption of
 
 | Package | Description |
 |---------|-------------|
-| [`@kagal/build-tsdoc`](packages/@kagal-build-tsdoc) | TSDoc extraction hook for unbuild; writes per-export JSON plus a unified `api.json` manifest to `_docs/` at build time. |
-| [`@kagal/nuxt-tsdoc`](packages/@kagal-nuxt-tsdoc) | Nuxt module that consumes `api.json` manifests produced by `@kagal/build-tsdoc`. |
+| [`@kagal/build-tsdoc`](packages/@kagal-build-tsdoc) | Build-hook adapter for `@microsoft/api-extractor`. Each entry's rolled declarations get a `<entry>.api.json` written next to them. |
+| [`@kagal/nuxt-tsdoc`](packages/@kagal-nuxt-tsdoc) | Nuxt module that consumes `*.api.json` manifests produced by `@kagal/build-tsdoc`. |
 
 The two packages form a pipeline: `@kagal/build-tsdoc`
 extracts documentation at package build time and ships
-`_docs/api.json` alongside the source; `@kagal/nuxt-tsdoc`
-is the Nuxt consumer for those manifests.
+`dist/<entry>.api.json` alongside the bundle;
+`@kagal/nuxt-tsdoc` is the Nuxt consumer for those
+manifests.
 
 ## Origin
 

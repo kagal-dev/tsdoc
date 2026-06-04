@@ -2,7 +2,7 @@
   "name": "@kagal/build-tsdoc",
   "version": "0.1.0",
   "type": "module",
-  "description": "TSDoc extraction hook for unbuild",
+  "description": "Build-hook adapter for @microsoft/api-extractor",
   "author": "Alejandro Mery <amery@apptly.co>",
   "license": "MIT",
   "homepage": "https://github.com/kagal-dev/tsdoc/tree/main/packages/@kagal-build-tsdoc#readme",
@@ -15,6 +15,9 @@
     "url": "https://github.com/kagal-dev/tsdoc/issues"
   },
   "keywords": [
+    "api-extractor",
+    "api-extractor-model",
+    "build-hook",
     "kagal",
     "tsdoc",
     "unbuild"
@@ -54,7 +57,8 @@
     "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
   },
   "dependencies": {
-    "tsdoc-markdown": "^1.4.1"
+    "@microsoft/api-extractor": "^7.58.7",
+    "@microsoft/api-extractor-model": "^7.33.8"
   },
   "devDependencies": {
     "@kagal/cross-test": "^0.1.3",
@@ -68,9 +72,6 @@
     "typescript": "~5.9.3",
     "unbuild": "3.6.1",
     "vitest": "^4.1.8"
-  },
-  "peerDependencies": {
-    "unbuild": ">=3.6.1"
   },
   "engines": {
     "node": ">= 20.20.1",

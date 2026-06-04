@@ -1,227 +1,262 @@
-// Symbol extraction from TypeScript sources
-// cspell:words dirents
-
-import { readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { BuildContext } from 'unbuild';
-import {
-  buildDocumentation,
-  type DocEntry,
-} from 'tsdoc-markdown';
-
-import type { DocumentsManifest } from './types';
-import { DuplicateExportPathError } from './errors';
-
-const SOURCE_FILE_PATTERN = /\.tsx?$/;
-const DECLARATION_FILE_PATTERN = /\.d\.tsx?$/;
-const TEST_FILE_PATTERN = /\.(test|spec)\.tsx?$/;
-const EXCLUDED_DIRECTORY_NAMES = new Set([
-  '__tests__',
-  '__mocks__',
-  'node_modules',
-]);
+import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
 
 /**
- * Recursively list TypeScript source files under
- * `directory`, skipping declarations, test files, and
- * conventional non-source subdirectories.
- *
- * @internal
+ * Options for {@link extractEntryManifest}. Every override is
+ * optional; the helper composes sensible `dist/<entryName>.*`
+ * defaults from {@link ExtractEntryOptions.projectFolder}
+ * when an override is omitted.
  */
-export function listSourceFiles(directory: string): string[] {
-  const dirents = readdirSync(directory, {
-    recursive: true,
-    withFileTypes: true,
+export interface ExtractEntryOptions {
+  /**
+   * Rolled declaration file the extractor parses. Overrides the
+   * default `<projectFolder>/dist/<entryName>.d.mts`.
+   */
+  entryFile?: string
+  /**
+   * Entry name. Drives the default declaration and output paths
+   * (`<projectFolder>/dist/<entryName>.d.mts` and
+   * `<projectFolder>/dist/<entryName>.api.json`).
+   *
+   * @defaultValue `'index'`
+   */
+  entryName?: string
+  /**
+   * Output directory holding the rolled declaration and the
+   * manifest. Replaces the `dist` segment of the default
+   * `entryFile`/`outputPath`; resolved against
+   * {@link ExtractEntryOptions.projectFolder} when relative.
+   *
+   * @defaultValue `'dist'`
+   */
+  outDir?: string
+  /**
+   * Where the API manifest is written. Overrides the default
+   * `<projectFolder>/dist/<entryName>.api.json`.
+   */
+  outputPath?: string
+  /**
+   * Package manifest path. Overrides the default
+   * `<projectFolder>/package.json`. Its `dependencies` keys
+   * drive dependency bundling.
+   */
+  packageFullPath?: string
+  /** Package root. Used as api-extractor's `<projectFolder>`. */
+  projectFolder: string
+  /**
+   * Compiler config for api-extractor. Overrides the default
+   * `<projectFolder>/tsconfig.json`.
+   */
+  tsconfigPath?: string
+}
+
+/** Result of a successful {@link extractEntryManifest} call. */
+export interface ExtractEntryResult {
+  /** Absolute path of the written API manifest. */
+  outputPath: string
+  /** Warnings reported by api-extractor (errors throw). */
+  warningCount: number
+}
+
+/** Effective paths composed by {@link resolveEntryPaths}. */
+interface ResolvedEntryPaths {
+  entryFile: string
+  entryName: string
+  outputPath: string
+  packageFullPath: string
+  tsconfigPath: string
+}
+
+/**
+ * Compose the effective paths from {@link ExtractEntryOptions},
+ * filling the documented `dist/<entryName>.*` defaults for any
+ * omitted override. Pure path math — no filesystem access.
+ */
+function resolveEntryPaths(
+  options: ExtractEntryOptions,
+): ResolvedEntryPaths {
+  const entryName = options.entryName ?? 'index';
+  const outDir = path.resolve(
+    options.projectFolder,
+    options.outDir ?? 'dist',
+  );
+  return {
+    entryFile: options.entryFile ??
+      path.join(outDir, `${entryName}.d.mts`),
+    entryName,
+    outputPath: options.outputPath ??
+      path.join(outDir, `${entryName}.api.json`),
+    packageFullPath: options.packageFullPath ??
+      path.join(options.projectFolder, 'package.json'),
+    tsconfigPath: options.tsconfigPath ??
+      path.join(options.projectFolder, 'tsconfig.json'),
+  };
+}
+
+/**
+ * Runtime dependency names from the package manifest, for
+ * api-extractor's `bundledPackages`. A symbol re-exported from
+ * a dependency is part of the package contract, so every
+ * runtime dependency is bundled — api-extractor inlines the
+ * referenced declarations into the doc model as if they were
+ * declared in the package, and dependencies the entry never
+ * references are a no-op.
+ */
+function bundledPackagesFromManifest(
+  packageFullPath: string,
+): string[] {
+  const manifest: unknown = JSON.parse(
+    readFileSync(packageFullPath, 'utf8'),
+  );
+  if (
+    typeof manifest === 'object' &&
+    manifest !== null &&
+    'dependencies' in manifest &&
+    typeof manifest.dependencies === 'object' &&
+    manifest.dependencies !== null
+  ) {
+    return Object.keys(manifest.dependencies);
+  }
+  return [];
+}
+
+/**
+ * Rewrite the `<fromPrefix>` of every `canonicalReference` string
+ * at or beneath {@link node}, in place. Used to graft an entry
+ * point's import path onto the references the doc model stores
+ * verbatim (the excerpt-token links it reads back as-is rather
+ * than rebuilding from the item hierarchy).
+ */
+function rewriteCanonicalReferences(
+  node: unknown,
+  fromPrefix: string,
+  toPrefix: string,
+): void {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      rewriteCanonicalReferences(item, fromPrefix, toPrefix);
+    }
+    return;
+  }
+  if (typeof node !== 'object' || node === null) {
+    return;
+  }
+  const record = node as Record<string, unknown>;
+  for (const [key, value] of Object.entries(record)) {
+    if (
+      key === 'canonicalReference' &&
+      typeof value === 'string' &&
+      value.startsWith(fromPrefix)
+    ) {
+      record[key] = toPrefix + value.slice(fromPrefix.length);
+    } else {
+      rewriteCanonicalReferences(value, fromPrefix, toPrefix);
+    }
+  }
+}
+
+/**
+ * Disambiguate a non-default entry by grafting its name onto the
+ * doc model's entry point as an import path. api-extractor emits
+ * one entry point per invocation with an empty import path, so
+ * every entry sharing a manifest collides on `@scope/pkg!` when a
+ * consumer merges the per-entry models. Setting the entry point's
+ * name (its `importPath`) to {@link entryName} makes the model
+ * rebuild each member's canonical reference as
+ * `@scope/pkg/<entry>!`, and the excerpt-token links — stored
+ * rather than rebuilt — are rewritten to match. The package name
+ * itself is untouched, so the package keeps its real identity and
+ * consumers key by the entry point.
+ */
+function injectEntryImportPath(
+  outputPath: string,
+  entryName: string,
+): void {
+  const root = JSON.parse(readFileSync(outputPath, 'utf8')) as {
+    members?: { name?: string }[]
+    name?: unknown
+  };
+  const packageName = root.name;
+  const entryPoint = root.members?.[0];
+  if (typeof packageName !== 'string' || entryPoint === undefined) {
+    return;
+  }
+  entryPoint.name = entryName;
+  rewriteCanonicalReferences(
+    entryPoint,
+    `${packageName}!`,
+    `${packageName}/${entryName}!`,
+  );
+  writeFileSync(outputPath, JSON.stringify(root, undefined, 2) + '\n');
+}
+
+/**
+ * Run api-extractor against a single rolled declaration file and
+ * write the resulting API model to disk. Returns `undefined` when
+ * the entry file is missing — stub builds skip declarations, so
+ * callers can invoke this unconditionally from a build hook.
+ *
+ * Runtime dependencies are bundled: a symbol re-exported from
+ * a dependency is part of the package contract, so its
+ * declaration is documented as part of the package itself
+ * rather than dropped as foreign.
+ *
+ * Caller-owned: this helper handles one entry. The caller (a
+ * bundler hook or a script) iterates its own entry list and
+ * invokes this per entry.
+ *
+ * @throws when api-extractor reports any error
+ */
+export function extractEntryManifest(
+  options: ExtractEntryOptions,
+): ExtractEntryResult | undefined {
+  const {
+    entryFile,
+    entryName,
+    outputPath,
+    packageFullPath,
+    tsconfigPath,
+  } = resolveEntryPaths(options);
+
+  if (!existsSync(entryFile)) {
+    return undefined;
+  }
+
+  const config = ExtractorConfig.prepare({
+    configObject: {
+      projectFolder: options.projectFolder,
+      mainEntryPointFilePath: entryFile,
+      bundledPackages: bundledPackagesFromManifest(packageFullPath),
+      compiler: { tsconfigFilePath: tsconfigPath },
+      docModel: { enabled: true, apiJsonFilePath: outputPath },
+      apiReport: { enabled: false },
+      dtsRollup: { enabled: false },
+    },
+    configObjectFullPath: undefined,
+    packageJsonFullPath: packageFullPath,
   });
 
-  const files: string[] = [];
-  for (const dirent of dirents) {
-    if (!dirent.isFile()) continue;
-    if (!SOURCE_FILE_PATTERN.test(dirent.name)) continue;
-    if (DECLARATION_FILE_PATTERN.test(dirent.name)) continue;
-    if (TEST_FILE_PATTERN.test(dirent.name)) continue;
+  const result = Extractor.invoke(config, {
+    localBuild: true,
+    showVerboseMessages: false,
+  });
 
-    const parent = dirent.parentPath;
-    const relative = path.relative(directory, parent);
-    const segments = relative ? relative.split(path.sep) : [];
-    if (segments.some((s) => EXCLUDED_DIRECTORY_NAMES.has(s))) {
-      continue;
-    }
-
-    files.push(path.join(parent, dirent.name));
-  }
-  return files.toSorted();
-}
-
-/**
- * Map an unbuild entry `name` to its package.json
- * `exports` key. `undefined` and `'index'` collapse
- * to the root export `'.'`.
- *
- * @internal
- */
-function resolveExportPath(name: string | undefined) {
-  return name === 'index' || !name ?
-    '.' :
-    `./${name}`;
-}
-
-/**
- * Compute the POSIX-style relative path from `from`
- * to `to`. Wrapper around `path.relative` that
- * normalises platform separators to `/`.
- *
- * @internal
- */
-function relative(from: string, to: string): string {
-  return path.relative(from, to).split(path.sep).join('/');
-}
-
-/**
- * Test whether a documented symbol carries the
- * `@internal` JSDoc tag.
- *
- * @internal
- */
-function isInternal(symbol: DocEntry) {
-  return symbol.jsDocs?.some(
-    (tag) => tag.name === 'internal',
-  ) ?? false;
-}
-
-/**
- * Recursively rewrite every `fileName` on a symbol tree
- * to a POSIX path relative to `rootDirectory`.
- *
- * @internal
- */
-export function sanitiseFileNames(
-  symbols: DocEntry[],
-  rootDirectory: string,
-) {
-  for (const symbol of symbols) {
-    if (symbol.fileName) {
-      symbol.fileName = relative(
-        rootDirectory, symbol.fileName,
-      );
-    }
-
-    if (symbol.parameters) {
-      sanitiseFileNames(
-        symbol.parameters, rootDirectory,
-      );
-    }
-
-    if (symbol.methods) {
-      sanitiseFileNames(
-        symbol.methods, rootDirectory,
-      );
-    }
-
-    if (symbol.properties) {
-      sanitiseFileNames(
-        symbol.properties, rootDirectory,
-      );
-    }
-
-    if (symbol.constructors) {
-      for (const constructor of symbol.constructors) {
-        if (constructor.parameters) {
-          sanitiseFileNames(
-            constructor.parameters, rootDirectory,
-          );
-        }
-      }
-    }
-  }
-}
-
-/**
- * Extract documented symbols for a single entry. The
- * `inputFile` may point at a file or a directory; a
- * directory is expanded via {@link listSourceFiles}.
- * Symbols tagged `@internal` are filtered out and any
- * absolute paths are sanitised relative to
- * `rootDirectory`. Returns `[]` and warns on failure
- * so a single broken entry never aborts the build.
- *
- * @internal
- */
-function extractSymbols(
-  inputFile: string,
-  rootDirectory: string,
-  exportPath: string,
-) {
-  try {
-    let stat;
-    try {
-      stat = statSync(inputFile);
-    } catch {
-      // Path may not exist or omit an extension —
-      // delegate handling to buildDocumentation.
-    }
-
-    const inputFiles = stat?.isDirectory() ?
-      listSourceFiles(inputFile) :
-      [inputFile];
-
-    if (inputFiles.length === 0) return [];
-
-    const symbols = buildDocumentation({
-      inputFiles,
-      options: { explore: true, types: true },
-    });
-
-    const visible = symbols.filter((s) => !isInternal(s));
-    sanitiseFileNames(visible, rootDirectory);
-    return visible;
-  } catch (error) {
-    console.warn(
-      `[docs] Failed for ${exportPath}:`, error,
+  if (!result.succeeded) {
+    throw new Error(
+      `api-extractor failed for ${entryFile}: ` +
+      `${result.errorCount} errors, ${result.warningCount} warnings`,
     );
-    return [];
-  }
-}
-
-/**
- * Extract documentation from all build entries.
- *
- * @internal
- */
-export function resolveDocuments(
-  context: BuildContext,
-): DocumentsManifest {
-  const rootDirectory = context.options.rootDir;
-
-  const manifest: DocumentsManifest = {
-    name: context.pkg.name,
-    version: context.pkg.version,
-    generatedAt: new Date().toISOString(),
-    exports: {},
-  };
-
-  for (const entry of context.options.entries) {
-    const exportPath = resolveExportPath(entry.name);
-    const previous = manifest.exports[exportPath];
-    if (previous) {
-      throw new DuplicateExportPathError(
-        exportPath, previous.entryFile, entry.input,
-      );
-    }
-
-    const inputFile = path.resolve(rootDirectory, entry.input);
-
-    const symbols = extractSymbols(
-      inputFile, rootDirectory, exportPath,
-    );
-
-    manifest.exports[exportPath] = {
-      entryFile: relative(rootDirectory, inputFile),
-      symbols,
-      symbolCount: symbols.length,
-    };
   }
 
-  return manifest;
+  // The default `index` entry keeps the bare package reference;
+  // every other entry is grafted onto the entry point's import
+  // path so its symbols carry a distinct `@scope/pkg/<entry>!`
+  // canonical reference.
+  if (entryName !== 'index') {
+    injectEntryImportPath(outputPath, entryName);
+  }
+
+  return { outputPath, warningCount: result.warningCount };
 }
