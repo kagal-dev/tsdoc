@@ -7,7 +7,15 @@
 /* global console, process */
 /* eslint unicorn/no-process-exit: "off" */
 
-import { extractEntryManifest, VERSION } from '../../dist/index.mjs';
+import {
+  asUnbuildContext,
+  DuplicateEntryNameError,
+  extractEntryManifest,
+  InvalidBuildEntryError,
+  newUnbuildHooks,
+  UnrecognisedBuildContextError,
+  VERSION,
+} from '../../dist/index.mjs';
 
 let failures = 0;
 
@@ -41,6 +49,14 @@ console.log(`@kagal/build-tsdoc v${VERSION}`);
 
 checkString('VERSION', VERSION);
 checkFunction('extractEntryManifest', extractEntryManifest);
+checkFunction('asUnbuildContext', asUnbuildContext);
+checkFunction('newUnbuildHooks', newUnbuildHooks);
+checkFunction('DuplicateEntryNameError', DuplicateEntryNameError);
+checkFunction('InvalidBuildEntryError', InvalidBuildEntryError);
+checkFunction(
+  'UnrecognisedBuildContextError',
+  UnrecognisedBuildContextError,
+);
 
 if (failures > 0) {
   console.error(`\n${failures} failure(s)`);

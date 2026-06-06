@@ -1,37 +1,45 @@
 # @kagal/build-tsdoc
 
 Build-hook adapter for `@microsoft/api-extractor`.
-Slim wrapper with `dist/<entryName>.*` defaults and a
-stub-aware skip so the call is safe from any
-`build:done` / `end` / similar hook.
+Slim wrapper with `dist/<entryName>.*` defaults, a
+stub-aware skip, and a hook factory for unbuild.
 
 ## Usage
 
+The factory returns a map keyed by the bundler's own
+hook names, so the result spreads straight into
+`hooks`:
+
 ```typescript
 import { defineBuildConfig } from 'unbuild';
-import { extractEntryManifest } from '@kagal/build-tsdoc';
+import { newUnbuildHooks } from '@kagal/build-tsdoc';
 
 export default defineBuildConfig({
   entries: [{ input: 'src/index', name: 'index' }],
   declaration: true,
-  hooks: {
-    'build:done'(context) {
-      if (context.options.stub) return;
-      for (const entry of context.options.entries) {
-        extractEntryManifest({
-          projectFolder: context.options.rootDir,
-          entryName: entry.name,
-        });
-      }
-    },
-  },
+  hooks: { ...newUnbuildHooks() },
 });
 ```
 
-Each call writes
-`<projectFolder>/dist/<entryName>.api.json` in
-`@microsoft/api-extractor-model`'s wire format, loadable
-with `ApiPackage.loadFromJsonFile()`.
+To combine extraction with other post-build steps,
+keep the map in a variable and call its hook from
+your own wrapper.
+
+Entries must be the bundler's own — they carry their
+bundler-resolved `name`, stub builds are skipped via
+`options.stub`, and per-entry `outDir` is honoured.
+Entries missing that data — e.g. hand-written name
+lists — are rejected with `InvalidBuildEntryError`:
+only the bundler's own entries carry the data
+extraction detects from.
+
+Each entry writes
+`<projectFolder>/<outDir>/<entryName>.api.json` in
+`@microsoft/api-extractor-model`'s wire format,
+loadable with `ApiPackage.loadFromJsonFile()`. For
+finer control, call
+`extractEntryManifest({ projectFolder, entryName })`
+yourself per entry — the hooks are a loop over it.
 
 ## Defaults
 
@@ -61,15 +69,20 @@ layouts.
   Dependencies the entry never references are a no-op.
 - Throws when api-extractor reports any error. Warnings
   surface in the returned `warningCount`.
-- Collision detection over the entry list is the
-  caller's responsibility — only the caller knows the
-  entry-name to output-filename mapping.
+- The bundler hooks reject duplicate entry names
+  with `DuplicateEntryNameError`, entries missing
+  their bundler-resolved data with
+  `InvalidBuildEntryError`, and contexts that match
+  no supported bundler shape with
+  `UnrecognisedBuildContextError`. The single-entry
+  `extractEntryManifest` has no list-level checks —
+  callers iterating directly own any collision logic.
 
 ## Exports
 
 | Export | Description |
 | --- | --- |
-| `@kagal/build-tsdoc` | `extractEntryManifest`, `ExtractEntryOptions`, `ExtractEntryResult`, `VERSION` |
+| `@kagal/build-tsdoc` | Helpers (`extractEntryManifest`, `newUnbuildHooks`, `asUnbuildContext`); types (`UnbuildBuildHookEntry`, `UnbuildBuildHookContext`, `UnbuildHooks`, `ExtractEntryOptions`, `ExtractEntryResult`); errors (`DuplicateEntryNameError`, `InvalidBuildEntryError`, `UnrecognisedBuildContextError`); `VERSION` |
 
 ## Licence
 

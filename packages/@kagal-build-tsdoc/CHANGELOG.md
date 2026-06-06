@@ -12,10 +12,11 @@ documented in this file.
   `<entryName>.api.json` in api-extractor's wire format,
   loadable via `ApiPackage.loadFromJsonFile()` from
   `@microsoft/api-extractor-model`.
-- Removed bundler coupling. No `unbuild` peer dep, no
-  `BuildContext` parameter. Callers wire their own
-  post-build hook and invoke `extractEntryManifest()`
-  per entry.
+- Removed bundler runtime coupling. No `unbuild` peer
+  dep. Single-entry `extractEntryManifest()` is
+  bundler-agnostic by data alone; the unbuild hook
+  factory matches its context structurally without
+  importing unbuild at type or runtime.
 - Output lands in `dist/` instead of `_docs/`, so api
   manifests ship with the package via
   `files: ["dist"]`.
@@ -27,9 +28,12 @@ documented in this file.
 - `DocumentsManifest`, `ExportManifest`,
   `DocumentsHookOptions`, `DocEntry` types
 - `DuplicateExportPathError`,
-  `DuplicateOutputFileError` — collision detection
-  belongs in the caller now (only the caller knows the
-  entry-name to output-filename mapping)
+  `DuplicateOutputFileError` — replaced by the narrower
+  `DuplicateEntryNameError` raised by the bundler hooks
+  when two entries resolve to the same `entryName`.
+  Single-entry `extractEntryManifest` has no list-level
+  checks — callers iterating manually own any collision
+  logic for that path.
 - `DEFAULT_OUTPUT_DIRECTORY` constant
 - `tsdoc-markdown` runtime dependency
 
@@ -43,7 +47,26 @@ documented in this file.
   api-extractor errors. Runtime dependencies are
   bundled, so symbols re-exported from a dependency
   are documented as part of the package itself.
-- `ExtractEntryOptions` and `ExtractEntryResult` types
+- `newUnbuildHooks()` — unbuild hook-map factory. Its
+  `build:done` hook loops `ctx.options.entries` calling
+  `extractEntryManifest` per entry. Keyed by hook name
+  so the map spreads straight into `hooks`.
+- Entries must be bundler-given: they carry their
+  bundler-resolved `name`, stub builds are skipped via
+  `options.stub`, and per-entry `outDir` is honoured.
+  The hooks detect duplicate entry names, entries
+  missing bundler-resolved data, and unrecognised
+  contexts.
+- `asUnbuildContext` — discriminator cast from
+  `unknown` to the matching context type or
+  `undefined`. Useful for callers handling untyped
+  values.
+- Types: `UnbuildBuildHookEntry`,
+  `UnbuildBuildHookContext`, `UnbuildHooks`,
+  `ExtractEntryOptions`, `ExtractEntryResult`.
+- Errors: `DuplicateEntryNameError`,
+  `InvalidBuildEntryError`,
+  `UnrecognisedBuildContextError`.
 - `@microsoft/api-extractor` and
   `@microsoft/api-extractor-model` runtime dependencies
 - `api-extractor`, `api-extractor-model`, `build-hook`

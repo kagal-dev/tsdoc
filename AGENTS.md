@@ -13,10 +13,11 @@ documentation:
 - **`@kagal/build-tsdoc`** — build-hook adapter for
   `@microsoft/api-extractor`. Thin wrapper with
   `dist/<entryName>.*` defaults and a stub-aware skip.
-  Callers invoke `extractEntryManifest()` per entry
-  from their own `build:done` / `end` / similar hook,
-  which writes a standard `<entryName>.api.json` next
-  to the rolled declarations.
+  Bundler users wire the `newUnbuildHooks()` hook map
+  into their build config; each entry gets a standard
+  `<entryName>.api.json` written next to its rolled
+  declarations. `extractEntryManifest()` is the
+  per-entry primitive for direct callers.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
   `*.api.json` manifests in Nuxt applications.
 
@@ -32,8 +33,12 @@ package source (*.ts)
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
 ```
 
-`@kagal/build-tsdoc` has no runtime knowledge of Nuxt
-or any specific bundler. `@kagal/nuxt-tsdoc` depends on
+`@kagal/build-tsdoc` has no runtime dependency on Nuxt
+or any bundler. Its bundler-context interfaces
+(`UnbuildBuildHookContext`) are narrow structural
+shapes, never imports — the helpers match real bundler
+contexts by shape.
+`@kagal/nuxt-tsdoc` depends on
 `@microsoft/api-extractor-model` to load the manifests.
 
 ## Monorepo Structure
@@ -43,8 +48,10 @@ tsdoc/
 ├── packages/
 │   ├── @kagal-build-tsdoc/    # @kagal/build-tsdoc
 │   │   └── src/
-│   │       ├── index.ts       # extractEntryManifest re-export, VERSION
-│   │       └── extract.ts     # api-extractor invocation + option types
+│   │       ├── index.ts       # public re-exports, VERSION
+│   │       ├── extract.ts     # api-extractor invocation + option types
+│   │       ├── errors.ts      # shared error classes
+│   │       └── unbuild.ts     # unbuild shim + newUnbuildHooks factory
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -244,9 +251,8 @@ options (ESNext, bundler resolution, strict mode).
   unbuild --stub` (conditional stubbing)
 - `dev:prepare`: `unbuild --stub` (unconditional)
 - `@kagal/build-tsdoc` dogfoods itself: its
-  `build.config.ts` loops over its own entries in the
-  `build:done` hook and calls `extractEntryManifest()`
-  for each, so every build produces
+  `build.config.ts` spreads `newUnbuildHooks()` into
+  its `hooks`, so every build produces
   `dist/<entry>.api.json` alongside the bundle. The
   config imports from `./src/index` — jiti resolves
   TS sources at config-load time, and the stub guard
