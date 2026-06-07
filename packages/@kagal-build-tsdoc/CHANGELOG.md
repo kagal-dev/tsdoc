@@ -5,6 +5,8 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-09
+
 ### Changed (breaking)
 
 - Replaced the `tsdoc-markdown` engine with

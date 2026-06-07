@@ -1,6 +1,6 @@
 {
   "name": "@kagal/build-tsdoc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Build-hook adapter for @microsoft/api-extractor",
   "author": "Alejandro Mery <amery@apptly.co>",
