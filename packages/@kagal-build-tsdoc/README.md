@@ -2,13 +2,14 @@
 
 Build-hook adapter for `@microsoft/api-extractor`.
 Slim wrapper with `dist/<entryName>.*` defaults, a
-stub-aware skip, and a hook factory for unbuild.
+stub-aware skip, and per-bundler hook factories for
+unbuild and obuild.
 
 ## Usage
 
-The factory returns a map keyed by the bundler's own
+Each factory returns a map keyed by the bundler's own
 hook names, so the result spreads straight into
-`hooks`:
+`hooks`. For unbuild:
 
 ```typescript
 import { defineBuildConfig } from 'unbuild';
@@ -21,17 +22,57 @@ export default defineBuildConfig({
 });
 ```
 
-To combine extraction with other post-build steps,
-keep the map in a variable and call its hook from
-your own wrapper.
+obuild's `end` hook does not carry entries, and only
+its `entries` hook sees them bundler-resolved (absolute
+paths, effective `stub` flags), so `newOBuildHooks()`
+returns a pair that captures from one and extracts
+from the other:
 
-Entries must be the bundler's own — they carry their
-bundler-resolved `name`, stub builds are skipped via
-`options.stub`, and per-entry `outDir` is honoured.
-Entries missing that data — e.g. hand-written name
-lists — are rejected with `InvalidBuildEntryError`:
-only the bundler's own entries carry the data
-extraction detects from.
+```typescript
+import { defineBuildConfig } from 'obuild/config';
+import { newOBuildHooks } from '@kagal/build-tsdoc';
+
+export default defineBuildConfig({
+  entries: [{ type: 'bundle', input: ['./src/index.ts'] }],
+  hooks: { ...newOBuildHooks() },
+});
+```
+
+Both obuild hooks must be wired — `end` throws
+`HooksNotWiredError` when `entries` never fired.
+
+To combine extraction with other post-build steps,
+keep the map in a variable and call its hooks from
+your own wrappers:
+
+```typescript
+import { copyFileSync } from 'node:fs';
+
+import { defineBuildConfig } from 'obuild/config';
+import { newOBuildHooks } from '@kagal/build-tsdoc';
+
+const tsdoc = newOBuildHooks();
+
+export default defineBuildConfig({
+  entries: [{ type: 'bundle', input: ['./src/index.ts'] }],
+  hooks: {
+    entries: tsdoc.entries,
+    end(context) {
+      tsdoc.end(context);
+      copyFileSync('dist/index.d.mts', 'dist/index.d.ts');
+    },
+  },
+});
+```
+
+unbuild entries carry their bundler-resolved `name`;
+obuild entry names derive from each `input` basename.
+Stub builds are skipped via unbuild's `options.stub`
+or obuild's per-entry `stub`; per-entry `outDir` is
+honoured. Entries missing that data — e.g.
+hand-written name lists — are rejected with
+`InvalidBuildEntryError`: only the bundler's own
+entries carry the data extraction detects from.
 
 Each entry writes
 `<projectFolder>/<outDir>/<entryName>.api.json` in
@@ -82,7 +123,7 @@ layouts.
 
 | Export | Description |
 | --- | --- |
-| `@kagal/build-tsdoc` | Helpers (`extractEntryManifest`, `newUnbuildHooks`, `asUnbuildContext`); types (`UnbuildBuildHookEntry`, `UnbuildBuildHookContext`, `UnbuildHooks`, `ExtractEntryOptions`, `ExtractEntryResult`); errors (`DuplicateEntryNameError`, `InvalidBuildEntryError`, `UnrecognisedBuildContextError`); `VERSION` |
+| `@kagal/build-tsdoc` | Helpers (`extractEntryManifest`, `newUnbuildHooks`, `newOBuildHooks`, `asUnbuildContext`, `asOBuildContext`); types (`UnbuildBuildHookEntry`, `UnbuildBuildHookContext`, `UnbuildHooks`, `OBuildBuildHookEntry`, `OBuildBuildHookContext`, `OBuildHooks`, `ExtractEntryOptions`, `ExtractEntryResult`); errors (`DuplicateEntryNameError`, `HooksNotWiredError`, `InvalidBuildEntryError`, `UnrecognisedBuildContextError`); `VERSION` |
 
 ## Licence
 

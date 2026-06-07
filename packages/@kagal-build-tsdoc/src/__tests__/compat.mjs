@@ -8,10 +8,13 @@
 /* eslint unicorn/no-process-exit: "off" */
 
 import {
+  asOBuildContext,
   asUnbuildContext,
   DuplicateEntryNameError,
   extractEntryManifest,
+  HooksNotWiredError,
   InvalidBuildEntryError,
+  newOBuildHooks,
   newUnbuildHooks,
   UnrecognisedBuildContextError,
   VERSION,
@@ -50,8 +53,11 @@ console.log(`@kagal/build-tsdoc v${VERSION}`);
 checkString('VERSION', VERSION);
 checkFunction('extractEntryManifest', extractEntryManifest);
 checkFunction('asUnbuildContext', asUnbuildContext);
+checkFunction('asOBuildContext', asOBuildContext);
 checkFunction('newUnbuildHooks', newUnbuildHooks);
+checkFunction('newOBuildHooks', newOBuildHooks);
 checkFunction('DuplicateEntryNameError', DuplicateEntryNameError);
+checkFunction('HooksNotWiredError', HooksNotWiredError);
 checkFunction('InvalidBuildEntryError', InvalidBuildEntryError);
 checkFunction(
   'UnrecognisedBuildContextError',

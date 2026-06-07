@@ -14,9 +14,10 @@ documented in this file.
   `@microsoft/api-extractor-model`.
 - Removed bundler runtime coupling. No `unbuild` peer
   dep. Single-entry `extractEntryManifest()` is
-  bundler-agnostic by data alone; the unbuild hook
-  factory matches its context structurally without
-  importing unbuild at type or runtime.
+  bundler-agnostic by data alone; the per-bundler hook
+  factories match unbuild and obuild contexts
+  structurally without importing either at type or
+  runtime.
 - Output lands in `dist/` instead of `_docs/`, so api
   manifests ship with the package via
   `files: ["dist"]`.
@@ -51,26 +52,37 @@ documented in this file.
   `build:done` hook loops `ctx.options.entries` calling
   `extractEntryManifest` per entry. Keyed by hook name
   so the map spreads straight into `hooks`.
-- Entries must be bundler-given: they carry their
-  bundler-resolved `name`, stub builds are skipped via
-  `options.stub`, and per-entry `outDir` is honoured.
-  The hooks detect duplicate entry names, entries
-  missing bundler-resolved data, and unrecognised
-  contexts.
-- `asUnbuildContext` — discriminator cast from
-  `unknown` to the matching context type or
+- `newOBuildHooks()` — obuild hook-pair factory, same
+  spreadable shape. obuild's `end` hook carries no
+  entries, so the `entries` callback captures the
+  bundler-resolved ones in a closure and `end` extracts
+  them, throwing `HooksNotWiredError` when `entries`
+  never fired.
+- Entries must be bundler-given: unbuild entries carry
+  their bundler-resolved `name`, obuild entry names
+  derive from each `input` basename, stub builds are
+  skipped via unbuild's `options.stub` or obuild's
+  per-entry `stub`, obuild `transform` entries are
+  skipped, and per-entry `outDir` is honoured. The
+  hooks detect duplicate entry names, entries missing
+  bundler-resolved data, and unrecognised contexts.
+- `asUnbuildContext`, `asOBuildContext` — discriminator
+  casts from `unknown` to the matching context type or
   `undefined`. Useful for callers handling untyped
   values.
 - Types: `UnbuildBuildHookEntry`,
   `UnbuildBuildHookContext`, `UnbuildHooks`,
-  `ExtractEntryOptions`, `ExtractEntryResult`.
+  `OBuildBuildHookEntry`, `OBuildBuildHookContext`,
+  `OBuildHooks`, `ExtractEntryOptions`,
+  `ExtractEntryResult`.
 - Errors: `DuplicateEntryNameError`,
-  `InvalidBuildEntryError`,
+  `HooksNotWiredError`, `InvalidBuildEntryError`,
   `UnrecognisedBuildContextError`.
 - `@microsoft/api-extractor` and
   `@microsoft/api-extractor-model` runtime dependencies
-- `api-extractor`, `api-extractor-model`, `build-hook`
-  added as `package.json` keywords for discoverability.
+- `api-extractor`, `api-extractor-model`, `build-hook`,
+  `obuild` added as `package.json` keywords for
+  discoverability.
 
 ## [0.1.0] - 2026-05-03
 

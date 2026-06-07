@@ -5,13 +5,14 @@
 // `<entryName>.api.json` next to the rolled declarations. The
 // resulting file is `@microsoft/api-extractor-model`'s wire format,
 // loadable with `ApiPackage.loadFromJsonFile()`. Bundler users
-// wire the `newUnbuildHooks()` hook map instead of calling it
-// directly.
+// wire the `newUnbuildHooks()` / `newOBuildHooks()` hook maps
+// instead of calling it directly.
 
 import pkg from '../package.json' with { type: 'json' };
 
 export {
   DuplicateEntryNameError,
+  HooksNotWiredError,
   InvalidBuildEntryError,
   UnrecognisedBuildContextError,
 } from './errors';
@@ -20,6 +21,13 @@ export {
   type ExtractEntryOptions,
   type ExtractEntryResult,
 } from './extract';
+export {
+  asOBuildContext,
+  newOBuildHooks,
+  type OBuildBuildHookContext,
+  type OBuildBuildHookEntry,
+  type OBuildHooks,
+} from './obuild';
 export {
   asUnbuildContext,
   newUnbuildHooks,

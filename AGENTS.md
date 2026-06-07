@@ -13,11 +13,12 @@ documentation:
 - **`@kagal/build-tsdoc`** — build-hook adapter for
   `@microsoft/api-extractor`. Thin wrapper with
   `dist/<entryName>.*` defaults and a stub-aware skip.
-  Bundler users wire the `newUnbuildHooks()` hook map
-  into their build config; each entry gets a standard
-  `<entryName>.api.json` written next to its rolled
-  declarations. `extractEntryManifest()` is the
-  per-entry primitive for direct callers.
+  Bundler users wire the `newUnbuildHooks()` /
+  `newOBuildHooks()` hook maps into their build config;
+  each entry gets a standard `<entryName>.api.json`
+  written next to its rolled declarations.
+  `extractEntryManifest()` is the per-entry primitive
+  for direct callers.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
   `*.api.json` manifests in Nuxt applications.
 
@@ -35,9 +36,9 @@ package source (*.ts)
 
 `@kagal/build-tsdoc` has no runtime dependency on Nuxt
 or any bundler. Its bundler-context interfaces
-(`UnbuildBuildHookContext`) are narrow structural
-shapes, never imports — the helpers match real bundler
-contexts by shape.
+(`UnbuildBuildHookContext`, `OBuildBuildHookContext`)
+are narrow structural shapes, never imports — the
+helpers match real bundler contexts by shape.
 `@kagal/nuxt-tsdoc` depends on
 `@microsoft/api-extractor-model` to load the manifests.
 
@@ -51,7 +52,8 @@ tsdoc/
 │   │       ├── index.ts       # public re-exports, VERSION
 │   │       ├── extract.ts     # api-extractor invocation + option types
 │   │       ├── errors.ts      # shared error classes
-│   │       └── unbuild.ts     # unbuild shim + newUnbuildHooks factory
+│   │       ├── unbuild.ts     # unbuild shim + newUnbuildHooks factory
+│   │       └── obuild.ts      # obuild shim + newOBuildHooks factory
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
