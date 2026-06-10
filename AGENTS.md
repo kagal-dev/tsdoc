@@ -10,12 +10,17 @@ This monorepo contains two MIT-licensed TypeScript
 packages for extracting and consuming TSDoc
 documentation:
 
-- **`@kagal/build-tsdoc`** — TSDoc extraction hook for
-  unbuild. Writes per-export JSON plus a unified
-  `api.json` manifest to `_docs/` at package build
-  time.
+- **`@kagal/build-tsdoc`** — build-hook adapter for
+  `@microsoft/api-extractor`. Thin wrapper with
+  `dist/<entryName>.*` defaults and a stub-aware skip.
+  Bundler users wire the `newUnbuildHooks()` /
+  `newOBuildHooks()` hook maps into their build config;
+  each entry gets a standard `<entryName>.api.json`
+  written next to its rolled declarations.
+  `extractEntryManifest()` is the per-entry primitive
+  for direct callers.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
-  `api.json` manifests in Nuxt applications.
+  `*.api.json` manifests in Nuxt applications.
 
 The packages form a strict one-way pipeline:
 
@@ -23,15 +28,19 @@ The packages form a strict one-way pipeline:
 package source (*.ts)
       │ extracted by
       ▼
-@kagal/build-tsdoc (unbuild hook) → _docs/api.json
+@kagal/build-tsdoc → dist/<entry>.api.json
       │ consumed by
       ▼
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
 ```
 
-`@kagal/build-tsdoc` has no runtime knowledge of Nuxt.
-`@kagal/nuxt-tsdoc` depends on `@kagal/build-tsdoc` only
-for shared types.
+`@kagal/build-tsdoc` has no runtime dependency on Nuxt
+or any bundler. Its bundler-context interfaces
+(`UnbuildBuildHookContext`, `OBuildBuildHookContext`)
+are narrow structural shapes, never imports — the
+helpers match real bundler contexts by shape.
+`@kagal/nuxt-tsdoc` depends on
+`@microsoft/api-extractor-model` to load the manifests.
 
 ## Monorepo Structure
 
@@ -40,10 +49,11 @@ tsdoc/
 ├── packages/
 │   ├── @kagal-build-tsdoc/    # @kagal/build-tsdoc
 │   │   └── src/
-│   │       ├── index.ts       # newDocumentsHook(), VERSION
-│   │       ├── types.ts       # Manifest types, DocEntry re-export
-│   │       ├── extract.ts     # Symbol extraction logic
-│   │       └── write.ts       # JSON output and logging
+│   │       ├── index.ts       # public re-exports, VERSION
+│   │       ├── extract.ts     # api-extractor invocation + option types
+│   │       ├── errors.ts      # shared error classes
+│   │       ├── unbuild.ts     # unbuild shim + newUnbuildHooks factory
+│   │       └── obuild.ts      # obuild shim + newOBuildHooks factory
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -243,12 +253,13 @@ options (ESNext, bundler resolution, strict mode).
   unbuild --stub` (conditional stubbing)
 - `dev:prepare`: `unbuild --stub` (unconditional)
 - `@kagal/build-tsdoc` dogfoods itself: its
-  `build.config.ts` registers `newDocumentsHook()`,
-  so every build produces `_docs/api.json` alongside
-  `dist/`. The config imports from `./src/index` —
-  jiti resolves TS sources at config-load time, and
-  stub mode short-circuits the hook so `dev:prepare`
-  never needs a built dist.
+  `build.config.ts` spreads `newUnbuildHooks()` into
+  its `hooks`, so every build produces
+  `dist/<entry>.api.json` alongside the bundle. The
+  config imports from `./src/index` — jiti resolves
+  TS sources at config-load time, and the stub guard
+  short-circuits the hook so `dev:prepare` never needs
+  a built dist.
 
 ## Publishing
 
@@ -256,19 +267,23 @@ npm packages are published via GitHub Actions using
 npm's OIDC trusted publishing with `--provenance`.
 No tokens stored as secrets.
 
-1. Push a version tag to trigger `publish.yml`. Two
-   patterns are accepted:
-   - `v[0-9]*` — repo-wide release (e.g. `v0.1.0`),
-     suitable when every publishable package shares
-     a version
-   - `@*/*@[0-9]*` — per-package release in the
-     standard npm form `@scope/name@version`
-     (e.g. `@kagal/build-tsdoc@0.1.0`)
+1. Push a per-package tag in the standard npm form
+   `@scope/name@version` (e.g.
+   `@kagal/build-tsdoc@0.1.0`) to trigger
+   `publish.yml`. The tag name is matched by
+   `@*/*@[0-9]*`.
 2. GitHub Actions authenticates to npm via OIDC
-3. `pnpm -r publish:maybe` checks each package —
-   publishes only if `$name@$version` is not yet on npm
-4. `pkg-pr-new` provides preview publishes on non-tag
-   pushes
+3. The workflow extracts the package name from the
+   tag and runs
+   `pnpm --filter <name> publish:maybe`, which
+   publishes the package only if `$name@$version`
+   is not yet on npm
+4. Independent package tags release concurrently —
+   the workflow's concurrency group is per-ref, so
+   one package's release does not queue behind
+   another
+5. `pkg-pr-new` provides preview publishes on
+   non-tag pushes
 
 <!-- cspell:words npmjs -->
 ### Setup (per package on npmjs.com)

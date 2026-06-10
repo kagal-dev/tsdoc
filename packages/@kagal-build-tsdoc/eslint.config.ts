@@ -6,10 +6,7 @@ import {
 
 const config: Config[] = defineConfig(
   {
-    ignores: [
-      '.claude/**/memory/**',
-      '.tmp/**',
-    ],
+    ignores: ['coverage'],
   },
   withAbbreviations(['dir', 'doc', 'docs']),
 );

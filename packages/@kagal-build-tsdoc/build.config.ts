@@ -1,6 +1,6 @@
 import { defineBuildConfig } from 'unbuild';
 
-import { newDocumentsHook } from './src/index';
+import { newUnbuildHooks } from './src/index';
 
 export default defineBuildConfig({
   entries: [
@@ -9,6 +9,6 @@ export default defineBuildConfig({
   declaration: true,
   sourcemap: true,
   hooks: {
-    'build:done': newDocumentsHook(),
+    ...newUnbuildHooks(),
   },
 });

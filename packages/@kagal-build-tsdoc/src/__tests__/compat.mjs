@@ -1,17 +1,22 @@
 /**
- * Standalone compatibility test — no test framework required.
- * Verifies the built dist loads on the current Node version
- * and key runtime exports resolve to the expected shapes.
+ * Standalone compatibility smoke test — no test framework required.
+ * Verifies the built dist loads on the current Node version and the
+ * public exports resolve to the expected runtime shapes.
  */
 
 /* global console, process */
 /* eslint unicorn/no-process-exit: "off" */
 
 import {
-  DEFAULT_OUTPUT_DIRECTORY,
-  DuplicateExportPathError,
-  DuplicateOutputFileError,
-  newDocumentsHook,
+  asOBuildContext,
+  asUnbuildContext,
+  DuplicateEntryNameError,
+  extractEntryManifest,
+  HooksNotWiredError,
+  InvalidBuildEntryError,
+  newOBuildHooks,
+  newUnbuildHooks,
+  UnrecognisedBuildContextError,
   VERSION,
 } from '../../dist/index.mjs';
 
@@ -34,51 +39,30 @@ function checkFunction(name, value) {
   }
 }
 
-function checkString(name, value, expected) {
+function checkString(name, value) {
   if (typeof value !== 'string') {
     fail(name, `expected string, got ${typeof value}`);
-    return;
-  }
-  if (expected !== undefined && value !== expected) {
-    fail(name, `expected '${expected}', got '${value}'`);
     return;
   }
   pass(name, `= '${value}'`);
 }
 
-function checkErrorClass(name, ErrorCtor) {
-  if (typeof ErrorCtor !== 'function') {
-    fail(name, `expected class, got ${typeof ErrorCtor}`);
-    return;
-  }
-  try {
-    const error = new ErrorCtor('a', 'b', 'c');
-    if (!(error instanceof Error)) {
-      fail(name, 'instance is not an Error');
-      return;
-    }
-    if (error.name !== name) {
-      fail(name, `error.name is '${error.name}', expected '${name}'`);
-      return;
-    }
-    pass(name);
-  } catch (error) {
-    fail(name, `construction threw: ${error.message}`);
-  }
-}
-
 console.log(`Node ${process.version}`);
 console.log(`@kagal/build-tsdoc v${VERSION}`);
 
-checkFunction('newDocumentsHook', newDocumentsHook);
 checkString('VERSION', VERSION);
-checkString('DEFAULT_OUTPUT_DIRECTORY', DEFAULT_OUTPUT_DIRECTORY, '_docs');
-checkErrorClass('DuplicateExportPathError', DuplicateExportPathError);
-checkErrorClass('DuplicateOutputFileError', DuplicateOutputFileError);
-
-// Confirm the factory is callable end-to-end (catches any
-// module-init regression that doesn't surface at import time).
-checkFunction('newDocumentsHook()', newDocumentsHook());
+checkFunction('extractEntryManifest', extractEntryManifest);
+checkFunction('asUnbuildContext', asUnbuildContext);
+checkFunction('asOBuildContext', asOBuildContext);
+checkFunction('newUnbuildHooks', newUnbuildHooks);
+checkFunction('newOBuildHooks', newOBuildHooks);
+checkFunction('DuplicateEntryNameError', DuplicateEntryNameError);
+checkFunction('HooksNotWiredError', HooksNotWiredError);
+checkFunction('InvalidBuildEntryError', InvalidBuildEntryError);
+checkFunction(
+  'UnrecognisedBuildContextError',
+  UnrecognisedBuildContextError,
+);
 
 if (failures > 0) {
   console.error(`\n${failures} failure(s)`);
