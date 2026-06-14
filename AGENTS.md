@@ -6,8 +6,8 @@ with code in the `kagal-dev/tsdoc` monorepo.
 
 ## Project Overview
 
-This monorepo contains two MIT-licensed TypeScript
-packages for extracting and consuming TSDoc
+This monorepo contains three MIT-licensed TypeScript
+packages for extracting, rendering, and consuming TSDoc
 documentation:
 
 - **`@kagal/build-tsdoc`** — build-hook adapter for
@@ -19,6 +19,12 @@ documentation:
   written next to its rolled declarations.
   `extractEntryManifest()` is the per-entry primitive
   for direct callers.
+- **`@kagal/vue-tsdoc`** — Vue components that render
+  the `@microsoft/api-extractor-model` typed graph from
+  a `*.api.json` manifest. `APIPackageView` walks a
+  loaded package and dispatches each item to a per-kind
+  view; `loadPackage()` reads a manifest from disk.
+  Nuxt-agnostic — depends only on Vue.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
   `*.api.json` manifests in Nuxt applications.
 
@@ -29,7 +35,10 @@ package source (*.ts)
       │ extracted by
       ▼
 @kagal/build-tsdoc → dist/<entry>.api.json
-      │ consumed by
+      │ rendered by
+      ▼
+@kagal/vue-tsdoc (Vue components)
+      │ integrated by
       ▼
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
 ```
@@ -54,6 +63,12 @@ tsdoc/
 │   │       ├── errors.ts      # shared error classes
 │   │       ├── unbuild.ts     # unbuild shim + newUnbuildHooks factory
 │   │       └── obuild.ts      # obuild shim + newOBuildHooks factory
+│   ├── @kagal-vue-tsdoc/      # @kagal/vue-tsdoc
+│   │   └── src/
+│   │       ├── index.ts       # public re-exports, VERSION, loadPackage
+│   │       ├── plugin.ts      # Vue plugin (class-name prefix)
+│   │       ├── components/    # per-kind presentational views
+│   │       └── lib/           # non-component rendering helpers
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -71,7 +86,7 @@ tsdoc/
 pnpm install
 pnpm build              # Build all packages
 pnpm clean              # Remove dist/ and node_modules
-pnpm dev:prepare        # Stub all packages (unbuild --stub)
+pnpm dev:prepare        # Stub all packages (unbuild/obuild --stub)
 pnpm test               # Test all packages
 pnpm lint               # Lint all (root + packages)
 pnpm type-check         # Type-check root tools + packages
@@ -240,18 +255,25 @@ options (ESNext, bundler resolution, strict mode).
 ## Testing
 
 - All packages use Vitest
-- Tests run in Node.js (no browser or workerd pool)
-- Test files: `*.test.ts` under `src/__tests__/`
+- build-tsdoc runs in Node.js (no browser or workerd
+  pool); vue-tsdoc runs under the jsdom environment so
+  its components mount against a DOM
+- Test files: `*.test.ts` under `src/__tests__/`;
+  vue-tsdoc also co-locates per-component specs as
+  `*.spec.ts` under `src/components/__tests__/`
 - `@kagal/cross-test` (external dep) provides the
   conditional stub helper for `prepare` scripts
 
 ## Build
 
-- **unbuild** for all packages (ESM + DTS, sourcemaps)
+- **unbuild** (`@kagal/build-tsdoc`) / **obuild**
+  (`@kagal/vue-tsdoc`) — ESM + DTS, sourcemaps
 - `build.config.ts` defines entry points
 - `prepare` script: `cross-test -s dist/index.mjs ||
-  unbuild --stub` (conditional stubbing)
-- `dev:prepare`: `unbuild --stub` (unconditional)
+  <stub>` (conditional stubbing) — build-tsdoc stubs with
+  `unbuild --stub`, vue-tsdoc with `pnpm dev:prepare`
+- `dev:prepare` (unconditional): `unbuild --stub`
+  (build-tsdoc) / `obuild --stub` (vue-tsdoc)
 - `@kagal/build-tsdoc` dogfoods itself: its
   `build.config.ts` spreads `newUnbuildHooks()` into
   its `hooks`, so every build produces

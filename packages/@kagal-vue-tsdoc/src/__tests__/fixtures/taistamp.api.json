@@ -1,0 +1,1253 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.58.7",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@jsx",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxRuntime",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxFrag",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxImportSource",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@betaDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@internalRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@preapproved",
+          "syntaxKind": "modifier"
+        }
+      ],
+      "supportForTags": {
+        "@alpha": true,
+        "@beta": true,
+        "@defaultValue": true,
+        "@decorator": true,
+        "@deprecated": true,
+        "@eventProperty": true,
+        "@example": true,
+        "@experimental": true,
+        "@inheritDoc": true,
+        "@internal": true,
+        "@label": true,
+        "@link": true,
+        "@override": true,
+        "@packageDocumentation": true,
+        "@param": true,
+        "@privateRemarks": true,
+        "@public": true,
+        "@readonly": true,
+        "@remarks": true,
+        "@returns": true,
+        "@sealed": true,
+        "@see": true,
+        "@throws": true,
+        "@typeParam": true,
+        "@virtual": true,
+        "@betaDocumentation": true,
+        "@internalRemarks": true,
+        "@preapproved": true
+      },
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@kagal/taistamp!",
+  "docComment": "",
+  "name": "@kagal/taistamp",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@kagal/taistamp!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!asLeapSeconds:function(1)",
+          "docComment": "/**\n * Coerce a `number` to a {@link LeapSeconds}. Returns `undefined` when `value` is non-integer, negative, or exceeds {@link TAI_LEAP_SECONDS_MAX}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "asLeapSeconds: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "LeapSeconds",
+              "canonicalReference": "@kagal/taistamp!LeapSeconds:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "asLeapSeconds"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!asNonce:function(1)",
+          "docComment": "/**\n * Brand `value` as a {@link Nonce} when it satisfies sf-binary syntax (RFC 9651 §3.3.5) and falls inside `[NONCE_MIN_OCTETS, NONCE_MAX_OCTETS]` — the wire range equivalent to spec §5.4's normative decoded-length bound of 7..129 octets. Returns `undefined` for anything else — every \"treat as absent\" case in spec §5.4 collapsed into one verdict.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "asNonce: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Nonce",
+              "canonicalReference": "@kagal/taistamp!Nonce:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "asNonce"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!composeSignaturePayload:function(1)",
+          "docComment": "/**\n * Compose the byte sequence covered by a TAI-Signature.\n *\n * @remarks\n *\n * Binding the selector into the signed payload stops a downgrade attacker from rewriting `TAI-Key-Selector` to point at a compromised or weaker key — the signature would no longer verify under that key. `leapSeconds` is encoded as a 4-byte big-endian unsigned integer; the selector is length-prefixed by a single byte (selectors are ≤ 63 chars per {@link newTaistampHandler}'s validation).\n *\n * @param label - the 25-byte TAI64N label string the server is returning\n *\n * @param leapSeconds - the leap-seconds count the server advertises in `TAI-Leap-Seconds`\n *\n * @param selector - the key selector the server advertises in `TAI-Key-Selector`; verifiers use this to look up the public key in DNS at `<selector>._taistamp.<host>`\n *\n * @param nonce - the client-supplied nonce, echoed verbatim in `TAI-Nonce`; brand a verifier-side string with {@link asNonce} before passing it in\n *\n * @returns the byte sequence verifiers reconstruct from the response and pass to their public-key verify routine. The framing is the domain-separation tag (`taistamp-v1` plus a trailing NUL byte), then the label bytes, then the leap-seconds count as a 4-byte big-endian unsigned integer, then a 1-byte selector length, then the selector bytes, then the decoded sf-binary octets of the nonce (spec §6.1 — the wire `:base64:` framing is not signed).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "composeSignaturePayload: (label: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", leapSeconds: "
+            },
+            {
+              "kind": "Reference",
+              "text": "LeapSeconds",
+              "canonicalReference": "@kagal/taistamp!LeapSeconds:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", selector: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", nonce: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Nonce",
+              "canonicalReference": "@kagal/taistamp!Nonce:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ArrayBuffer",
+              "canonicalReference": "!ArrayBuffer:interface"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 9,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "label",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "leapSeconds",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "selector",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "nonce",
+              "parameterTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "composeSignaturePayload"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!extractLeapSeconds:function(1)",
+          "docComment": "/**\n * Extract a usable leap-seconds count from response headers. Returns `undefined` when the `TAI-Leap-Seconds` field is missing, empty, non-numeric, non-integer, negative, or out-of-range — every \"treat as unsigned\" case in spec §5.3 collapsed into one verdict.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "extractLeapSeconds: (headers: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Headers",
+              "canonicalReference": "!Headers:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "LeapSeconds",
+              "canonicalReference": "@kagal/taistamp!LeapSeconds:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "headers",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "extractLeapSeconds"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!fromUTC:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "fromUTC: (utc: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "timestamp",
+              "canonicalReference": "@kagal/taistamp!~timestamp:type"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "utc",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "fromUTC"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@kagal/taistamp!LeapSeconds:type",
+          "docComment": "/**\n * `number` that has been confirmed to fit the `[0, TAI_LEAP_SECONDS_MAX]` u32be range required by the taistamp signed-payload framing. Construct only via {@link extractLeapSeconds} or {@link asLeapSeconds}; the brand prevents an arbitrary number from reaching the signing path.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "type LeapSeconds = "
+            },
+            {
+              "kind": "Content",
+              "text": "number & {\n  readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "LeapSecondsBrand",
+              "canonicalReference": "@kagal/taistamp!~LeapSecondsBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: never;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "releaseTag": "Public",
+          "name": "LeapSeconds",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!newTaistampHandler:function(1)",
+          "docComment": "/**\n * Build a handler for `/.well-known/taistamp`.\n *\n * @remarks\n *\n * Behaviour:\n *\n * - `GET` / `HEAD` — body is a fresh 25-byte TAI64N label (`HEAD` omits the body). Response headers: Content-Type `application/tai64n`, Content-Length `25`, Cache-Control `no-store`, plus `TAI-Leap-Seconds` carrying the current count. - `OPTIONS` — `200` with `Allow: GET, HEAD, OPTIONS`. When CORS is enabled (the default) the response also carries `Access-Control-Allow-*` and `-Expose-Headers` per {@link TaistampHandlerConfig.cors}. `OPTIONS` is never signed. - Any other method — `405 Method Not Allowed` with `Allow: GET, HEAD, OPTIONS`. - Request `TAI-Nonce` — on `GET`, the value is echoed verbatim in the response. A missing, empty, duplicated, structurally malformed, or length-out-of-range field is treated as absent (no echo, no signature) per spec §5.4 — see {@link extractNonce}. `HEAD`, `OPTIONS`, and `405` responses never carry `TAI-Nonce` per spec §5.1. - Request `TAI-Nonce` *and* `signer` configured *and* the request method is `GET` — adds `TAI-Key-Selector` and `TAI-Signature` (sf-binary) over the bytes produced by {@link composeSignaturePayload}. The domain-separation tag means the same key cannot be tricked into producing valid signatures for other protocols. `HEAD`, `OPTIONS`, and `405` responses are never signed.\n *\n * The corresponding public key is expected to be published out-of-band as a DNS TXT record at `<selector>._taistamp.<host>` — verifiers fetch the key by selector so the operator can rotate keys by publishing a new selector while the old one is still cached.\n *\n * @param config - optional {@link TaistampHandlerConfig}\n *\n * @returns an `async (request) => Response` callable directly as a Web `fetch` handler or as a Hono route handler.\n *\n * @throws\n *\n * TypeError if `signer` and `selector` are not both set or both unset, or if `selector` does not match `[A-Za-z][A-Za-z0-9_-]{0,62}`.\n *\n * @see\n *\n * {@link https://cr.yp.to/libtai/tai64.html} for TAI64N format\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "newTaistampHandler: (config?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TaistampHandlerConfig",
+              "canonicalReference": "@kagal/taistamp!TaistampHandlerConfig:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "((request: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Request",
+              "canonicalReference": "!Request:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Response",
+              "canonicalReference": "!Response:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">)"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "newTaistampHandler"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@kagal/taistamp!Nonce:type",
+          "docComment": "/**\n * `string` that has been confirmed to satisfy the sf-binary syntax of RFC 9651 §3.3.5 and to fall inside the wire-form length range `[NONCE_MIN_OCTETS, NONCE_MAX_OCTETS]` — the pre-decode form of spec §5.4's normative decoded-length bound of 7..129 octets. Construct only via {@link asNonce} or {@link extractNonce}; the brand prevents arbitrary strings from reaching the signing path.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "type Nonce = "
+            },
+            {
+              "kind": "Content",
+              "text": "string & {\n  readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "NonceBrand",
+              "canonicalReference": "@kagal/taistamp!~NonceBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: never;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "releaseTag": "Public",
+          "name": "Nonce",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!now:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "now: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "timestamp",
+              "canonicalReference": "@kagal/taistamp!~timestamp:type"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "now"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!readASCII:function(1)",
+          "docComment": "/**\n * Read a response body as a 7-bit ASCII string.\n *\n * `application/tai64n` is an octet-typed media type, not text: the TAI64N label is a fixed sequence of ASCII bytes. Reading it with `Response.text()` would route the body through UTF-8 decoding and silently mangle any non-ASCII octet, so this reads the raw bytes and decodes them one code point per byte instead.\n *\n * Throws `TypeError` on any byte ≥ `0x80`, surfacing a malformed body rather than masking it; pass `context` to prefix that error message. Consumes the response body, which can only be read once.\n *\n * Use {@link readLabel} when the body is meant to be a TAI64N label and its length should be validated too.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "readASCII: (response: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Response",
+              "canonicalReference": "!Response:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", context?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "response",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "context",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "readASCII"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!readLabel:function(1)",
+          "docComment": "/**\n * Read and return the TAI64N label from a response body.\n *\n * Builds on {@link readASCII}, adding the structural invariant every label satisfies: the body is exactly `TAI64N_CONTENT_LENGTH` octets. Throws `TypeError` if the length differs or the body carries a non-ASCII octet; pass `context` to prefix that error message. Consumes the response body.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "readLabel: (response: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Response",
+              "canonicalReference": "!Response:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", context?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "response",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "context",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "readLabel"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI_LEAP_SECONDS_MAX:var",
+          "docComment": "/**\n * Upper bound for `leapSeconds` in the taistamp signed payload. The framing encodes the value as a 4-byte big-endian unsigned integer, so any input outside `[0, 2^32-1]` cannot be represented. Verifiers MUST treat an out-of-range `TAI-Leap-Seconds` response header as unsigned, per spec §5.3.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI_LEAP_SECONDS_MAX = "
+            },
+            {
+              "kind": "Content",
+              "text": "4294967295"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI_LEAP_SECONDS_MAX",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI_LEAP_SECONDS:var",
+          "docComment": "/**\n * Current TAI − UTC offset in whole seconds, used by `fromUTC()` and emitted in the `TAI-Leap-Seconds` response header. The value 37 has been in force since 2017-01-01; update on the next IERS leap-second announcement.\n *\n * @remarks\n *\n * Stays a single `LeapSeconds` until a leap-seconds table is added so the offset can be computed for any TAI second; this constant becomes redundant then.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI_LEAP_SECONDS: "
+            },
+            {
+              "kind": "Reference",
+              "text": "LeapSeconds",
+              "canonicalReference": "@kagal/taistamp!LeapSeconds:type"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI_LEAP_SECONDS",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64_EPOCH_HI:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64_EPOCH_HI = "
+            },
+            {
+              "kind": "Content",
+              "text": "1073741824"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64_EPOCH_HI",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_CONTENT_LENGTH:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_CONTENT_LENGTH: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_CONTENT_LENGTH",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_CONTENT_TYPE:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_CONTENT_TYPE = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"application/tai64n\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_CONTENT_TYPE",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_HEADER_KEY_SELECTOR:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_HEADER_KEY_SELECTOR = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"TAI-Key-Selector\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_HEADER_KEY_SELECTOR",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_HEADER_LEAP_SECONDS:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_HEADER_LEAP_SECONDS = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"TAI-Leap-Seconds\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_HEADER_LEAP_SECONDS",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_HEADER_NONCE:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_HEADER_NONCE = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"TAI-Nonce\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_HEADER_NONCE",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_HEADER_SIGNATURE:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_HEADER_SIGNATURE = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"TAI-Signature\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_HEADER_SIGNATURE",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAI64N_PATH:var",
+          "docComment": "/**\n * @deprecated\n *\n * Renamed to {@link TAISTAMP_PATH}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAI64N_PATH = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"/.well-known/taistamp\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAI64N_PATH",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!tai64nLabel:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "tai64nLabel: (value?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "timestamp",
+              "canonicalReference": "@kagal/taistamp!~timestamp:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "tai64nLabel"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@kagal/taistamp!tai64nLabelFromUTC:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "tai64nLabelFromUTC: (utc: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "utc",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "tai64nLabelFromUTC"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!TAISTAMP_PATH:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TAISTAMP_PATH = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"/.well-known/taistamp\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TAISTAMP_PATH",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@kagal/taistamp!TaistampHandlerConfig:interface",
+          "docComment": "/**\n * Configuration for {@link newTaistampHandler}.\n *\n * @remarks\n *\n * `signer` and `selector` are co-required: pass both to enable authenticated responses, or neither for an unsigned handler. Passing only one is rejected at construction time — without the selector verifiers cannot find the key in DNS, and a selector without a signer is a misconfiguration.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface TaistampHandlerConfig "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "releaseTag": "Public",
+          "name": "TaistampHandlerConfig",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@kagal/taistamp!TaistampHandlerConfig#cors:member",
+              "docComment": "/**\n * CORS origin policy. Defaults to `'*'`; pass `false` to disable CORS entirely, or a specific origin (e.g. `'https://example.com'`) to scope the policy.\n *\n * Every response (`GET` / `HEAD` / `OPTIONS` / `405`) gains `Access-Control-Allow-Origin`; pre-flight `OPTIONS` also carries `-Allow-Methods`, `-Allow-Headers`, `-Expose-Headers`, and `-Max-Age: 600` per spec §5.2; success `GET` / `HEAD` carry `-Expose-Headers` so browser JS can read the `TAI-*` response headers. A non-`'*'` value adds `Vary: Origin` so caches can keep per-origin variants distinct.\n *\n * Disabling CORS does not affect method discovery: `OPTIONS` is still answered with `200` and `Allow: GET, HEAD, OPTIONS` per RFC 9110 §9.3.7.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "cors?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "false | string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "cors",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@kagal/taistamp!TaistampHandlerConfig#selector:member",
+              "docComment": "/**\n * Key selector advertised in the `TAI-Key-Selector` response header and bound into the signed payload. Verifiers look up the public key at `<selector>._taistamp.<host>` in DNS.\n *\n * Must match `[A-Za-z][A-Za-z0-9_-]{0,62}` (a single DNS label starting with a letter, using DKIM-compatible characters and a valid sf-token); rotate by changing the selector and publishing a new TXT record.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "selector?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "selector",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@kagal/taistamp!TaistampHandlerConfig#signer:member",
+              "docComment": "/**\n * {@link Signer} that produces `TAI-Signature` over the framed payload from {@link composeSignaturePayload}. Without a signer the nonce is still echoed but the response is unsigned.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "signer?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Signer$1",
+                  "canonicalReference": "@kagal/ed25519-secret!Signer:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "signer",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@kagal/taistamp!VERSION:var",
+          "docComment": "/**\n * Package version from package.json.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VERSION: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.mts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VERSION",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        }
+      ]
+    }
+  ]
+}

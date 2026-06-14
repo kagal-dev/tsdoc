@@ -3,7 +3,8 @@
   "language": "en-GB",
   "ignorePaths": [
     "**/pnpm-lock.yaml",
-    "**/cspell.json"
+    "**/cspell.json",
+    "**/__tests__/fixtures/*.api.json"
   ],
   "words": [
     "apptly",

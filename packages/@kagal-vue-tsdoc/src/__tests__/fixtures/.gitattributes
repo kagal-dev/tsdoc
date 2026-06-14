@@ -1,0 +1,5 @@
+# api-extractor emits these doc-model fixtures with CRLF by default
+# (ExtractorConfig newlineKind falls back to CrLf when unset); pin
+# them to LF so regenerated fixtures stay consistent with the repo
+# .editorconfig.
+*.api.json eol=lf
