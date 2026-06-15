@@ -20,6 +20,7 @@ export {
   extractEntryManifest,
   type ExtractEntryOptions,
   type ExtractEntryResult,
+  type NewlineKind,
 } from './extract';
 export {
   asOBuildContext,
