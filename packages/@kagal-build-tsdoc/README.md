@@ -121,9 +121,33 @@ layouts.
 
 ## Exports
 
-| Export | Description |
-| --- | --- |
-| `@kagal/build-tsdoc` | Helpers (`extractEntryManifest`, `newUnbuildHooks`, `newOBuildHooks`, `asUnbuildContext`, `asOBuildContext`); types (`UnbuildBuildHookEntry`, `UnbuildBuildHookContext`, `UnbuildHooks`, `OBuildBuildHookEntry`, `OBuildBuildHookContext`, `OBuildHooks`, `ExtractEntryOptions`, `ExtractEntryResult`); errors (`DuplicateEntryNameError`, `HooksNotWiredError`, `InvalidBuildEntryError`, `UnrecognisedBuildContextError`); `VERSION` |
+### Functions
+
+- `extractEntryManifest` — extract one entry's
+  `.api.json`
+- `newUnbuildHooks`, `newOBuildHooks` — per-bundler
+  hook-map factories
+- `asUnbuildContext`, `asOBuildContext` — narrow an
+  `unknown` context to the matching bundler shape
+
+### Types
+
+- `ExtractEntryOptions`, `ExtractEntryResult` — the
+  helper's options and result
+- `UnbuildHooks`, `UnbuildBuildHookContext`,
+  `UnbuildBuildHookEntry` — unbuild shapes
+- `OBuildHooks`, `OBuildBuildHookContext`,
+  `OBuildBuildHookEntry` — obuild shapes
+
+### Errors
+
+- `DuplicateEntryNameError`, `HooksNotWiredError`,
+  `InvalidBuildEntryError`,
+  `UnrecognisedBuildContextError`
+
+### Constant
+
+- `VERSION` — package version
 
 ## Licence
 
