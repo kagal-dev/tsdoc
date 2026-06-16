@@ -1,7 +1,21 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { EOL } from 'node:os';
 import path from 'node:path';
 
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
+
+/**
+ * Line-ending policy for the emitted manifest, mirroring
+ * api-extractor's `newlineKind`. `'os'` writes the host's native
+ * endings, `'lf'`/`'crlf'` force one regardless of platform.
+ */
+export type NewlineKind = 'crlf' | 'lf' | 'os';
+
+/**
+ * A {@link NewlineKind} with `'os'` already resolved to the host's
+ * concrete ending — what actually drives the write.
+ */
+type ConcreteNewlineKind = Exclude<NewlineKind, 'os'>;
 
 /**
  * Options for {@link extractEntryManifest}. Every override is
@@ -23,6 +37,16 @@ export interface ExtractEntryOptions {
    * @defaultValue `'index'`
    */
   entryName?: string
+  /**
+   * Line endings for the written manifest. The manifest is
+   * consumer territory, so the default follows the host OS rather
+   * than api-extractor's CRLF default — the file matches whatever
+   * the consuming repo normalises to. Force `'lf'`/`'crlf'` to
+   * pin it regardless of platform.
+   *
+   * @defaultValue `'os'`
+   */
+  newlineKind?: NewlineKind
   /**
    * Output directory holding the rolled declaration and the
    * manifest. Replaces the `dist` segment of the default
@@ -158,6 +182,45 @@ function rewriteCanonicalReferences(
 }
 
 /**
+ * Resolve the requested ending to a concrete kind that drives both
+ * api-extractor's write and the import-path rewrite. Only `'lf'`
+ * and `'crlf'` are honoured verbatim; `'os'`, an omitted option,
+ * and any unexpected value (empty string, an untyped caller's
+ * typo) all fall back to the host default. `EOL` is `'\r\n'` on
+ * Windows and `'\n'` everywhere else (modern macOS included), so it
+ * maps cleanly onto `'crlf'`/`'lf'`.
+ */
+function resolveNewlineKind(
+  kind: NewlineKind | undefined,
+): ConcreteNewlineKind {
+  if (kind === 'lf' || kind === 'crlf') {
+    return kind;
+  }
+  return EOL === '\r\n' ? 'crlf' : 'lf';
+}
+
+/**
+ * Serialise a value as JSON text the way api-extractor writes its
+ * files: 2-space indent, trailing newline, and the line endings of
+ * {@link newlineKind} — resolved via {@link resolveNewlineKind}, so
+ * `'os'`, an omitted argument, and any unexpected value follow the
+ * host. `JSON.stringify` escapes newlines within string values, so
+ * the only raw breaks are structural — and the CRLF pass normalises
+ * any `\r?\n` to a single `\r\n` rather than a bare `\n`→`\r\n`
+ * swap, so it can never emit `\r\r\n` even if fed already-CRLF'd
+ * text.
+ */
+export function serialiseJSON(
+  value: unknown,
+  newlineKind?: NewlineKind,
+): string {
+  const json = JSON.stringify(value, undefined, 2) + '\n';
+  return resolveNewlineKind(newlineKind) === 'crlf' ?
+    json.replaceAll(/\r?\n/g, '\r\n') :
+    json;
+}
+
+/**
  * Disambiguate a non-default entry by grafting its name onto the
  * doc model's entry point as an import path. api-extractor emits
  * one entry point per invocation with an empty import path, so
@@ -173,6 +236,7 @@ function rewriteCanonicalReferences(
 function injectEntryImportPath(
   outputPath: string,
   entryName: string,
+  newlineKind: ConcreteNewlineKind,
 ): void {
   const root = JSON.parse(readFileSync(outputPath, 'utf8')) as {
     members?: { name?: string }[]
@@ -189,7 +253,7 @@ function injectEntryImportPath(
     `${packageName}!`,
     `${packageName}/${entryName}!`,
   );
-  writeFileSync(outputPath, JSON.stringify(root, undefined, 2) + '\n');
+  writeFileSync(outputPath, serialiseJSON(root, newlineKind));
 }
 
 /**
@@ -224,10 +288,19 @@ export function extractEntryManifest(
     return undefined;
   }
 
+  // The manifest is consumer territory, not ours: the helper
+  // defaults to the host OS's native line endings (rather than
+  // api-extractor's CRLF default) for anything but an explicit
+  // `'lf'`/`'crlf'`, so the file matches whatever the consuming
+  // repo normalises to and the same concrete kind feeds both the
+  // extractor write and the import-path rewrite.
+  const newlineKind = resolveNewlineKind(options.newlineKind);
+
   const config = ExtractorConfig.prepare({
     configObject: {
       projectFolder: options.projectFolder,
       mainEntryPointFilePath: entryFile,
+      newlineKind,
       bundledPackages: bundledPackagesFromManifest(packageFullPath),
       compiler: { tsconfigFilePath: tsconfigPath },
       docModel: { enabled: true, apiJsonFilePath: outputPath },
@@ -255,7 +328,7 @@ export function extractEntryManifest(
   // path so its symbols carry a distinct `@scope/pkg/<entry>!`
   // canonical reference.
   if (entryName !== 'index') {
-    injectEntryImportPath(outputPath, entryName);
+    injectEntryImportPath(outputPath, entryName, newlineKind);
   }
 
   return { outputPath, warningCount: result.warningCount };

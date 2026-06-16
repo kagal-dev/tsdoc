@@ -1,18 +1,24 @@
+// cspell:words lfcr
 import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { EOL, tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ApiPackage } from '@microsoft/api-extractor-model';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { extractEntryManifest } from '../extract';
+import {
+  extractEntryManifest,
+  type NewlineKind,
+  serialiseJSON,
+} from '../extract';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = path.resolve(HERE, '../..');
@@ -245,5 +251,122 @@ describe('extractEntryManifest', () => {
 
     const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
     expect(apiPackage.displayName).toBe('@kagal/probe');
+  });
+
+  it('writes the host ending to disk by default', () => {
+    // the default newlineKind is 'os': the file on disk must carry
+    // the host's native ending, NOT api-extractor's CRLF default —
+    // proving the resolved kind is threaded into the extractor
+    // config rather than left to the extractor's own default
+    const outputPath = path.join(workDir, 'default.api.json');
+    const result = extractEntryManifest({
+      projectFolder: PKG_DIR,
+      outputPath,
+    });
+    expect(result?.outputPath).toBe(outputPath);
+
+    const raw = readFileSync(outputPath, 'utf8');
+    if (EOL === '\r\n') {
+      expect(raw).toContain('\r\n');
+      expect(raw).not.toMatch(/[^\r]\n/);
+    } else {
+      expect(raw).not.toContain('\r');
+    }
+    // still valid JSON the model can load back
+    expect(ApiPackage.loadFromJsonFile(outputPath).displayName)
+      .toBe('@kagal/build-tsdoc');
+  });
+
+  it('writes CRLF through the import-path rewrite for a non-index entry', () => {
+    // a non-index entry runs injectEntryImportPath, so the bytes on
+    // disk are serialiseJSON's output rewritten over api-extractor's
+    // own write — this exercises the CRLF pass end-to-end, not just
+    // the extractor config
+    writeFileSync(
+      path.join(workDir, 'package.json'),
+      JSON.stringify({ name: '@kagal/probe', version: '0.0.0' }),
+    );
+    writeFileSync(
+      path.join(workDir, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
+          strict: true,
+        },
+      }),
+    );
+    mkdirSync(path.join(workDir, 'dist'));
+    writeFileSync(
+      path.join(workDir, 'dist', 'utils.d.mts'),
+      '/** Utils marker. */\nexport declare const utilsFlag: boolean;\n',
+    );
+
+    const outputPath = path.join(workDir, 'utils.api.json');
+    const result = extractEntryManifest({
+      projectFolder: workDir,
+      entryName: 'utils',
+      outputPath,
+      newlineKind: 'crlf',
+    });
+    expect(result?.outputPath).toBe(outputPath);
+
+    // single CRLF throughout, never a doubled CR nor a lone LF
+    const raw = readFileSync(outputPath, 'utf8');
+    expect(raw).toContain('\r\n');
+    expect(raw).not.toContain('\r\r\n');
+    expect(raw).not.toMatch(/[^\r]\n/);
+    // the rewrite ran: the entry carries the grafted subpath
+    const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
+    expect(apiPackage.entryPoints[0].importPath).toBe('utils');
+  });
+});
+
+describe('serialiseJSON', () => {
+  // an embedded newline in a value must survive as an escaped `\n`,
+  // never become a physical break the CRLF pass could touch
+  const sample = {
+    metadata: { toolPackage: '@microsoft/api-extractor' },
+    doc: 'first line\nsecond line',
+    members: [{ name: 'indexFlag' }],
+  };
+
+  it('writes LF with a trailing newline for \'lf\'', () => {
+    const out = serialiseJSON(sample, 'lf');
+    expect(out).not.toContain('\r');
+    expect(out).toBe(JSON.stringify(sample, undefined, 2) + '\n');
+  });
+
+  it('writes single CRLF for \'crlf\', never a doubled CR', () => {
+    const out = serialiseJSON(sample, 'crlf');
+    expect(out).toContain('\r\n');
+    expect(out).not.toContain('\r\r\n');
+    expect(out.endsWith('\r\n')).toBe(true);
+    // no lone LF and no lone CR survives the conversion
+    expect(out).not.toMatch(/[^\r]\n/);
+    expect(out).not.toMatch(/\r[^\n]/);
+  });
+
+  it('leaves embedded newlines escaped, not converted to breaks', () => {
+    const crlf = serialiseJSON(sample, 'crlf');
+    // the value's newline stays JSON-escaped, untouched by the pass
+    expect(crlf).toContain(String.raw`first line\nsecond line`);
+    // so the structural break count matches the LF rendering exactly
+    const crlfBreaks = crlf.match(/\r\n/g) ?? [];
+    const lfBreaks = serialiseJSON(sample, 'lf').match(/\n/g) ?? [];
+    expect(crlfBreaks.length).toBe(lfBreaks.length);
+  });
+
+  it('falls back to the host ending for \'os\', omitted, and bad input', () => {
+    const host: NewlineKind = EOL === '\r\n' ? 'crlf' : 'lf';
+    const expected = serialiseJSON(sample, host);
+    expect(serialiseJSON(sample)).toBe(expected);
+    expect(serialiseJSON(sample, 'os')).toBe(expected);
+    // an untyped caller's empty string or typo resolves to the host
+    // default rather than reaching the writer as an invalid kind
+    const empty: string = '';
+    const typo: string = 'lfcr';
+    expect(serialiseJSON(sample, empty as NewlineKind)).toBe(expected);
+    expect(serialiseJSON(sample, typo as NewlineKind)).toBe(expected);
   });
 });

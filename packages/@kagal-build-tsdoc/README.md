@@ -98,6 +98,13 @@ Paths derive from `projectFolder`, `outDir`, and
 Override any of them individually for non-standard
 layouts.
 
+`newlineKind` selects the manifest's line endings
+(`'os' | 'crlf' | 'lf'`, default `'os'`). The default
+follows the host, so the file matches whatever the
+consuming repo normalises to; pin `'lf'` or `'crlf'`
+to override. An omitted or unexpected value falls back
+to the host default.
+
 ## Behaviour
 
 - Returns `undefined` when `entryFile` is missing — stub
@@ -121,9 +128,35 @@ layouts.
 
 ## Exports
 
-| Export | Description |
-| --- | --- |
-| `@kagal/build-tsdoc` | Helpers (`extractEntryManifest`, `newUnbuildHooks`, `newOBuildHooks`, `asUnbuildContext`, `asOBuildContext`); types (`UnbuildBuildHookEntry`, `UnbuildBuildHookContext`, `UnbuildHooks`, `OBuildBuildHookEntry`, `OBuildBuildHookContext`, `OBuildHooks`, `ExtractEntryOptions`, `ExtractEntryResult`); errors (`DuplicateEntryNameError`, `HooksNotWiredError`, `InvalidBuildEntryError`, `UnrecognisedBuildContextError`); `VERSION` |
+### Functions
+
+- `extractEntryManifest` — extract one entry's
+  `.api.json`
+- `newUnbuildHooks`, `newOBuildHooks` — per-bundler
+  hook-map factories
+- `asUnbuildContext`, `asOBuildContext` — narrow an
+  `unknown` context to the matching bundler shape
+
+### Types
+
+- `ExtractEntryOptions`, `ExtractEntryResult` — the
+  helper's options and result
+- `NewlineKind` — manifest line-ending policy
+  (`'os' | 'crlf' | 'lf'`)
+- `UnbuildHooks`, `UnbuildBuildHookContext`,
+  `UnbuildBuildHookEntry` — unbuild shapes
+- `OBuildHooks`, `OBuildBuildHookContext`,
+  `OBuildBuildHookEntry` — obuild shapes
+
+### Errors
+
+- `DuplicateEntryNameError`, `HooksNotWiredError`,
+  `InvalidBuildEntryError`,
+  `UnrecognisedBuildContextError`
+
+### Constant
+
+- `VERSION` — package version
 
 ## Licence
 

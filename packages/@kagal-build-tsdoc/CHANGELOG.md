@@ -5,6 +5,24 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-06-16
+
+### Changed
+
+- Generated `.api.json` now follows the host's native
+  line endings by default instead of api-extractor's
+  CRLF, so the manifest matches whatever the consuming
+  repo normalises to.
+
+### Added
+
+- `newlineKind` option on `extractEntryManifest` /
+  `ExtractEntryOptions` (`'os' | 'crlf' | 'lf'`,
+  default `'os'`), plus the `NewlineKind` type. Force
+  `'lf'`/`'crlf'` to pin the ending regardless of
+  platform; an omitted or unexpected value falls back
+  to the host default.
+
 ## [0.2.0] - 2026-06-09
 
 ### Changed (breaking)
