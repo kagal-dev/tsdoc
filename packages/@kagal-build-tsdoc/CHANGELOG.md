@@ -5,6 +5,8 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-06-16
+
 ### Changed
 
 - Generated `.api.json` now follows the host's native
