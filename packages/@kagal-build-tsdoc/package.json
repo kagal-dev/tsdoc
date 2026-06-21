@@ -58,21 +58,21 @@
     "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "^7.58.8",
+    "@microsoft/api-extractor": "^7.58.9",
     "@microsoft/api-extractor-model": "^7.33.8"
   },
   "devDependencies": {
     "@kagal/cross-test": "^0.1.3",
     "@poupe/eslint-config": "^0.10.0",
     "@types/node": "^20.19.43",
-    "@vitest/coverage-istanbul": "^4.1.8",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "eslint": "^10.4.1",
-    "npm-run-all2": "^9.0.1",
+    "npm-run-all2": "^9.0.2",
     "publint": "^0.3.21",
     "rimraf": "^6.1.3",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">= 20.20.1",
