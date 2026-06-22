@@ -30,7 +30,7 @@
     "@poupe/eslint-config": "^0.10.0",
     "@types/node": "^20.19.43",
     "cspell": "^10.0.1",
-    "eslint": "^10.4.1",
+    "eslint": "^10.5.0",
     "npm-run-all2": "^9.0.2",
     "pkg-pr-new": "~0.0.75",
     "rimraf": "^6.1.3",
