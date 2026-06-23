@@ -11,6 +11,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 import APIMemberList from './api-member-list.vue';
 
@@ -21,9 +22,11 @@ const props = defineProps<{ item: ApiClass }>();
 const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
-const extendsText = computed(() => props.item.extendsType?.excerpt.text.trim() ?? '');
+const extendsText = computed(() => props.item.extendsType ?
+  excerptText(props.item.extendsType.excerpt) :
+  '');
 const implementsText = computed(() => props.item.implementsTypes
-  .map((h) => h.excerpt.text.trim())
+  .map((h) => excerptText(h.excerpt))
   .join(', '));
 </script>
 

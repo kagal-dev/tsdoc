@@ -8,6 +8,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 defineOptions({ name: 'APITypeAliasView' });
 
@@ -16,7 +17,7 @@ const props = defineProps<{ item: ApiTypeAlias }>();
 const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
-const typeText = computed(() => props.item.typeExcerpt.text.trim());
+const typeText = computed(() => excerptText(props.item.typeExcerpt));
 </script>
 
 <template>

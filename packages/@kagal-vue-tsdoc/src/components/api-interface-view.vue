@@ -9,6 +9,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 import APIMemberList from './api-member-list.vue';
 
@@ -20,7 +21,7 @@ const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
 const extendsText = computed(() => props.item.extendsTypes
-  .map((h) => h.excerpt.text.trim())
+  .map((h) => excerptText(h.excerpt))
   .join(', '));
 </script>
 

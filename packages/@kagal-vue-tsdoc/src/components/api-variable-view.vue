@@ -9,6 +9,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 defineOptions({ name: 'APIVariableView' });
 
@@ -17,7 +18,7 @@ const props = defineProps<{ item: ApiVariable }>();
 const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
-const type = computed(() => props.item.variableTypeExcerpt.text.trim());
+const type = computed(() => excerptText(props.item.variableTypeExcerpt));
 </script>
 
 <template>
