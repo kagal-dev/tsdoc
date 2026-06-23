@@ -11,6 +11,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 defineOptions({ name: 'APIMethodView' });
 
@@ -20,9 +21,9 @@ const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
 const params = computed(() => props.item.parameters
-  .map((p) => `${p.name}${p.isOptional ? '?' : ''}: ${p.parameterTypeExcerpt.text.trim()}`)
+  .map((p) => `${p.name}${p.isOptional ? '?' : ''}: ${excerptText(p.parameterTypeExcerpt)}`)
   .join(', '));
-const returnType = computed(() => props.item.returnTypeExcerpt.text.trim());
+const returnType = computed(() => excerptText(props.item.returnTypeExcerpt));
 </script>
 
 <template>

@@ -165,6 +165,16 @@ describe('APIPackageView with the taistamp fixture', () => {
     const summaries = wrapper.findAll('.api-summary').map((node) => node.text());
     expect(summaries).toContain('Package version from package.json.');
   });
+
+  it('renders a re-exported reference type without the bundler alias', () => {
+    // TaistampHandlerConfig.signer is typed `Signer`, inlined by the
+    // bundler as `Signer$1`; the rendered signature shows `Signer`.
+    const pkg = loadFixture('taistamp.api.json');
+    const wrapper = mount(APIPackageView, { props: { package: pkg } });
+    const text = wrapper.text();
+    expect(text).toContain('signer?: Signer');
+    expect(text).not.toContain('Signer$1');
+  });
 });
 
 // shapes.api.json is a generated api-extractor fixture over a synthetic

@@ -10,6 +10,7 @@ import { computed } from 'vue';
 
 import { useAPIClasses } from '../lib/classes';
 import { summaryFor } from '../lib/document';
+import { excerptText } from '../lib/excerpt';
 
 defineOptions({ name: 'APIPropertyView' });
 
@@ -18,7 +19,7 @@ const props = defineProps<{ item: ApiPropertyItem }>();
 const tsdoc = useAPIClasses(props.item.kind);
 
 const summary = computed(() => summaryFor(props.item));
-const type = computed(() => props.item.propertyTypeExcerpt.text.trim());
+const type = computed(() => excerptText(props.item.propertyTypeExcerpt));
 </script>
 
 <template>
