@@ -76,7 +76,7 @@
   },
   "engines": {
     "node": ">= 20.20.1",
-    "pnpm": ">= 10.33.4"
+    "pnpm": ">= 11.9.0"
   },
   "publishConfig": {
     "access": "public",
