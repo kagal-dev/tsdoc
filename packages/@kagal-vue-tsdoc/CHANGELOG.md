@@ -29,3 +29,7 @@ documented in this file.
   `dist/index.api.json` alongside the bundle and
   declarations. Prototype lives in this package; no
   dependency on `@kagal/build-tsdoc`
+- Enum members render their initialiser (`Red = 0`), and
+  a `const` with a literal initialiser renders its value
+  (`MAX = 5`) — including the inferred-type case where the
+  model carries the value but no separate type excerpt

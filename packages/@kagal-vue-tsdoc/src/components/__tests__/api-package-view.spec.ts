@@ -175,6 +175,40 @@ describe('APIPackageView with the taistamp fixture', () => {
     expect(text).toContain('signer?: Signer');
     expect(text).not.toContain('Signer$1');
   });
+
+  it('renders a const literal value when the type is inferred', () => {
+    // TAI_LEAP_SECONDS_MAX = 4294967295 has a literal initialiser and
+    // no separate type excerpt; the value renders without a dangling
+    // colon for the empty type.
+    const pkg = loadFixture('taistamp.api.json');
+    const wrapper = mount(APIPackageView, { props: { package: pkg } });
+    const signatures = wrapper.findAll('.api-variable code')
+      .map((node) => node.text());
+    expect(signatures).toContain('TAI_LEAP_SECONDS_MAX = 4294967295');
+    // The buggy render dropped the value and left `name:` (the empty
+    // type's trailing colon, trimmed); assert that exact form is gone.
+    expect(signatures).not.toContain('TAI_LEAP_SECONDS_MAX:');
+  });
+
+  it('renders a const string literal with its quotes intact', () => {
+    // TAISTAMP_PATH = "/.well-known/taistamp" is a string const with an
+    // inferred type; the quoted value renders verbatim.
+    const pkg = loadFixture('taistamp.api.json');
+    const wrapper = mount(APIPackageView, { props: { package: pkg } });
+    const signatures = wrapper.findAll('.api-variable code')
+      .map((node) => node.text());
+    expect(signatures).toContain('TAISTAMP_PATH = "/.well-known/taistamp"');
+  });
+
+  it('renders a declared variable type when there is no initialiser', () => {
+    // TAI_LEAP_SECONDS: LeapSeconds carries a type but no initialiser,
+    // so it stays `name: type` with no trailing ` = `.
+    const pkg = loadFixture('taistamp.api.json');
+    const wrapper = mount(APIPackageView, { props: { package: pkg } });
+    const signatures = wrapper.findAll('.api-variable code')
+      .map((node) => node.text());
+    expect(signatures).toContain('TAI_LEAP_SECONDS: LeapSeconds');
+  });
 });
 
 // shapes.api.json is a generated api-extractor fixture over a synthetic
@@ -209,6 +243,15 @@ describe('APIPackageView with the shapes fixture', () => {
     const wrapper = mount(APIPackageView, { props: { package: pkg } });
     expect(wrapper.findAll('.api-enum').length).toBe(1);
     expect(wrapper.findAll('.api-enum-member').length).toBe(3);
+  });
+
+  it('renders each enum member with its initialiser value', () => {
+    const wrapper = mount(APIPackageView, { props: { package: pkg } });
+    const members = wrapper.findAll('.api-enum-member code')
+      .map((node) => node.text());
+    expect(members).toContain('Red = 0');
+    expect(members).toContain('Green = 1');
+    expect(members).toContain('Blue = 2');
   });
 
   it('dispatches class methods to APIMethodView with a static badge', () => {

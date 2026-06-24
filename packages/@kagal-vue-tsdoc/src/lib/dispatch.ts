@@ -6,6 +6,7 @@ import type { Component } from 'vue';
 import { ApiItemKind } from '@microsoft/api-extractor-model';
 
 import APIClassView from '../components/api-class-view.vue';
+import APIEnumMemberView from '../components/api-enum-member-view.vue';
 import APIEnumView from '../components/api-enum-view.vue';
 import APIFunctionView from '../components/api-function-view.vue';
 import APIGenericItemView from '../components/api-generic-item-view.vue';
@@ -32,6 +33,7 @@ function getRegistry(): Partial<Record<ApiItemKind, Component>> {
     [ApiItemKind.Property]: APIPropertyView,
     [ApiItemKind.PropertySignature]: APIPropertyView,
     [ApiItemKind.Enum]: APIEnumView,
+    [ApiItemKind.EnumMember]: APIEnumMemberView,
     [ApiItemKind.TypeAlias]: APITypeAliasView,
     [ApiItemKind.Variable]: APIVariableView,
   };
