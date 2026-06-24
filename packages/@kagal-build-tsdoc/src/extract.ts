@@ -1,21 +1,14 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { EOL } from 'node:os';
 import path from 'node:path';
 
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
 
-/**
- * Line-ending policy for the emitted manifest, mirroring
- * api-extractor's `newlineKind`. `'os'` writes the host's native
- * endings, `'lf'`/`'crlf'` force one regardless of platform.
- */
-export type NewlineKind = 'crlf' | 'lf' | 'os';
-
-/**
- * A {@link NewlineKind} with `'os'` already resolved to the host's
- * concrete ending — what actually drives the write.
- */
-type ConcreteNewlineKind = Exclude<NewlineKind, 'os'>;
+import {
+  type ConcreteNewlineKind,
+  type NewlineKind,
+  resolveNewlineKind,
+  serialiseJSON,
+} from './utils';
 
 /**
  * Options for {@link extractEntryManifest}. Every override is
@@ -179,45 +172,6 @@ function rewriteCanonicalReferences(
       rewriteCanonicalReferences(value, fromPrefix, toPrefix);
     }
   }
-}
-
-/**
- * Resolve the requested ending to a concrete kind that drives both
- * api-extractor's write and the import-path rewrite. Only `'lf'`
- * and `'crlf'` are honoured verbatim; `'os'`, an omitted option,
- * and any unexpected value (empty string, an untyped caller's
- * typo) all fall back to the host default. `EOL` is `'\r\n'` on
- * Windows and `'\n'` everywhere else (modern macOS included), so it
- * maps cleanly onto `'crlf'`/`'lf'`.
- */
-function resolveNewlineKind(
-  kind: NewlineKind | undefined,
-): ConcreteNewlineKind {
-  if (kind === 'lf' || kind === 'crlf') {
-    return kind;
-  }
-  return EOL === '\r\n' ? 'crlf' : 'lf';
-}
-
-/**
- * Serialise a value as JSON text the way api-extractor writes its
- * files: 2-space indent, trailing newline, and the line endings of
- * {@link newlineKind} — resolved via {@link resolveNewlineKind}, so
- * `'os'`, an omitted argument, and any unexpected value follow the
- * host. `JSON.stringify` escapes newlines within string values, so
- * the only raw breaks are structural — and the CRLF pass normalises
- * any `\r?\n` to a single `\r\n` rather than a bare `\n`→`\r\n`
- * swap, so it can never emit `\r\r\n` even if fed already-CRLF'd
- * text.
- */
-export function serialiseJSON(
-  value: unknown,
-  newlineKind?: NewlineKind,
-): string {
-  const json = JSON.stringify(value, undefined, 2) + '\n';
-  return resolveNewlineKind(newlineKind) === 'crlf' ?
-    json.replaceAll(/\r?\n/g, '\r\n') :
-    json;
 }
 
 /**

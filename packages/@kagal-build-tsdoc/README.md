@@ -5,6 +5,10 @@ Slim wrapper with `dist/<entryName>.*` defaults, a
 stub-aware skip, and per-bundler hook factories for
 unbuild and obuild.
 
+The root entry runs the extraction; a dependency-light
+`/utils` subpath holds helpers for working with the
+emitted manifests without pulling in api-extractor.
+
 ## Usage
 
 Each factory returns a map keyed by the bundler's own
@@ -126,7 +130,40 @@ to the host default.
   `extractEntryManifest` has no list-level checks —
   callers iterating directly own any collision logic.
 
+## `@kagal/build-tsdoc/utils`
+
+Dependency-light helpers for working with manifests,
+importable without pulling in api-extractor. The main
+helper is `serialiseJSON`, which formats a value as JSON
+the way api-extractor writes manifests — 2-space indent,
+trailing newline, and configurable line endings:
+
+```typescript
+import { serialiseJSON } from '@kagal/build-tsdoc/utils';
+
+const json = serialiseJSON(value);     // host endings
+const lf = serialiseJSON(value, 'lf');  // forced LF
+```
+
+The endings follow the same `NewlineKind`
+(`'os' | 'crlf' | 'lf'`, default host) as the manifest
+writer; `resolveNewlineKind` exposes that resolution on
+its own. The subpath exports:
+
+- `serialiseJSON(value, newlineKind?)` — JSON text in
+  api-extractor's manifest format
+- `resolveNewlineKind(kind?)` — resolve a `NewlineKind`
+  to the host's concrete `'crlf' | 'lf'`
+- `NewlineKind` — line-ending policy
+  (`'os' | 'crlf' | 'lf'`)
+- `ConcreteNewlineKind` — a `NewlineKind` with `'os'`
+  resolved (`'crlf' | 'lf'`); the type
+  `resolveNewlineKind` returns
+
 ## Exports
+
+The lists below cover the root entry; the
+`@kagal/build-tsdoc/utils` subpath is documented above.
 
 ### Functions
 

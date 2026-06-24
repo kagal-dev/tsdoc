@@ -20,7 +20,6 @@ export {
   extractEntryManifest,
   type ExtractEntryOptions,
   type ExtractEntryResult,
-  type NewlineKind,
 } from './extract';
 export {
   asOBuildContext,
@@ -36,6 +35,7 @@ export {
   type UnbuildBuildHookEntry,
   type UnbuildHooks,
 } from './unbuild';
+export type { NewlineKind } from './utils';
 
 /** Package version from package.json. */
 export const VERSION: string = pkg.version;

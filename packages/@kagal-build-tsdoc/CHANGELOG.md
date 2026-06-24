@@ -5,6 +5,17 @@ documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `@kagal/build-tsdoc/utils` subpath exposing
+  `serialiseJSON(value, newlineKind?)`,
+  `resolveNewlineKind`, and the `NewlineKind` /
+  `ConcreteNewlineKind` types — JSON serialisation
+  matching api-extractor's manifest output (2-space
+  indent, trailing newline, `NewlineKind` line endings).
+  Dependency-light: importable without pulling in
+  api-extractor.
+
 ### Changed
 
 - Pinned `rollup` to `^4.62.2` through a workspace
