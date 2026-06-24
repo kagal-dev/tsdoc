@@ -14,11 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { ApiPackage } from '@microsoft/api-extractor-model';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  extractEntryManifest,
-  type NewlineKind,
-  serialiseJSON,
-} from '../extract';
+import { extractEntryManifest } from '../extract';
+import { type NewlineKind, serialiseJSON } from '../utils';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = path.resolve(HERE, '../..');
