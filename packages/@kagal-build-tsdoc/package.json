@@ -75,7 +75,7 @@
     "vitest": "^4.1.9"
   },
   "engines": {
-    "node": ">= 20.20.1",
+    "node": ">= 20.20.2",
     "pnpm": ">= 10.33.4"
   },
   "publishConfig": {
