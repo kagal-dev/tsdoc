@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * `APIEnumView` — renders an `ApiEnum` header and recurses into
- * its `ApiEnumMember` children via `APIMemberList`. Members fall
- * back to `APIGenericItemView` (no per-kind view yet).
+ * its `ApiEnumMember` children via `APIMemberList`, each rendered
+ * by `APIEnumMemberView`.
  */
 import type { ApiEnum } from '@microsoft/api-extractor-model';
 import { computed } from 'vue';

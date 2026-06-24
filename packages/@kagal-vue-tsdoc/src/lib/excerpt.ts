@@ -6,6 +6,7 @@
 // (`Signer`), which is what readers expect to see.
 
 import {
+  type ApiInitializerMixin,
   type Excerpt,
   type ExcerptToken,
   ExcerptTokenKind,
@@ -56,4 +57,16 @@ export function excerptText(excerpt: Excerpt): string {
       token.text;
   }
   return text.trim();
+}
+
+/**
+ * The literal initialiser an item declares, as plain text, or `''`
+ * when it has none. A `const` with a literal value (or a valued enum
+ * member) carries an `initializerExcerpt`; a declared-type variable
+ * or a computed enum member does not. Use to render `name = value`.
+ */
+export function initializerText(item: ApiInitializerMixin): string {
+  return item.initializerExcerpt ?
+    excerptText(item.initializerExcerpt) :
+    '';
 }

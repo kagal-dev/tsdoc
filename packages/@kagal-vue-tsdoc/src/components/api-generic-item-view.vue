@@ -4,7 +4,7 @@
  * `ApiItem` kinds without a dedicated view. Shows kind + display
  * name + doc summary, and recurses into members so unknown
  * container kinds still render their subtree. The section class
- * reflects the actual item kind (e.g. `api-item api-enum-member`)
+ * reflects the actual item kind (e.g. `api-item api-index-signature`)
  * rather than a generic catch-all — consumers can still target
  * specific kinds without a per-kind view existing.
  */
