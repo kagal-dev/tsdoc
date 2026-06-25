@@ -11,11 +11,10 @@ import { EOL, tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ApiPackage } from '@microsoft/api-extractor-model';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { extractEntryManifest } from '../extract';
-import { type NewlineKind, serialiseJSON } from '../utils';
+import { loadPackage, type NewlineKind, serialiseJSON } from '../utils';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PKG_DIR = path.resolve(HERE, '../..');
@@ -54,7 +53,7 @@ describe('extractEntryManifest', () => {
     expect(result?.outputPath).toBe(outputPath);
     expect(existsSync(outputPath)).toBe(true);
 
-    const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
+    const apiPackage = loadPackage(outputPath);
     expect(apiPackage.displayName).toBe('@kagal/build-tsdoc');
 
     const exported = apiPackage.entryPoints
@@ -160,7 +159,7 @@ describe('extractEntryManifest', () => {
     });
     expect(result?.outputPath).toBe(outputPath);
 
-    const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
+    const apiPackage = loadPackage(outputPath);
     const members = apiPackage.entryPoints
       .flatMap((ep) => ep.members)
       .map((m) => m.displayName);
@@ -208,8 +207,8 @@ describe('extractEntryManifest', () => {
       outputPath: utilsOut,
     });
 
-    const indexPkg = ApiPackage.loadFromJsonFile(indexOut);
-    const utilsPkg = ApiPackage.loadFromJsonFile(utilsOut);
+    const indexPkg = loadPackage(indexOut);
+    const utilsPkg = loadPackage(utilsOut);
 
     // the package keeps its real identity in both models
     expect(indexPkg.name).toBe('@kagal/probe');
@@ -246,7 +245,7 @@ describe('extractEntryManifest', () => {
     });
     expect(result?.outputPath).toBe(outputPath);
 
-    const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
+    const apiPackage = loadPackage(outputPath);
     expect(apiPackage.displayName).toBe('@kagal/probe');
   });
 
@@ -270,7 +269,7 @@ describe('extractEntryManifest', () => {
       expect(raw).not.toContain('\r');
     }
     // still valid JSON the model can load back
-    expect(ApiPackage.loadFromJsonFile(outputPath).displayName)
+    expect(loadPackage(outputPath).displayName)
       .toBe('@kagal/build-tsdoc');
   });
 
@@ -314,7 +313,7 @@ describe('extractEntryManifest', () => {
     expect(raw).not.toContain('\r\r\n');
     expect(raw).not.toMatch(/[^\r]\n/);
     // the rewrite ran: the entry carries the grafted subpath
-    const apiPackage = ApiPackage.loadFromJsonFile(outputPath);
+    const apiPackage = loadPackage(outputPath);
     expect(apiPackage.entryPoints[0].importPath).toBe('utils');
   });
 });

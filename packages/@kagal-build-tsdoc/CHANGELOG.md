@@ -7,14 +7,20 @@ documented in this file.
 
 ### Added
 
-- `@kagal/build-tsdoc/utils` subpath exposing
-  `serialiseJSON(value, newlineKind?)`,
-  `resolveNewlineKind`, and the `NewlineKind` /
-  `ConcreteNewlineKind` types — JSON serialisation
-  matching api-extractor's manifest output (2-space
-  indent, trailing newline, `NewlineKind` line endings).
-  Dependency-light: importable without pulling in
-  api-extractor.
+- `@kagal/build-tsdoc/utils` subpath — dependency-light
+  helpers for the emitted manifests, importable without
+  pulling in api-extractor:
+  - `loadPackage(file)` reads a `*.api.json` manifest
+    back into an `ApiPackage` (the api-extractor-model
+    graph), the inverse of `extractEntryManifest`. It
+    depends on `@microsoft/api-extractor-model` alone, so
+    a renderer or SSR consumer reads manifests without
+    the build tooling in its bundle graph.
+  - `serialiseJSON(value, newlineKind?)`,
+    `resolveNewlineKind`, and the `NewlineKind` /
+    `ConcreteNewlineKind` types — JSON serialisation
+    matching api-extractor's manifest output (2-space
+    indent, trailing newline, `NewlineKind` line endings).
 
 ## [0.2.1] - 2026-06-16
 
