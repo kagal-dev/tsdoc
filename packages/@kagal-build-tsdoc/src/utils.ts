@@ -1,13 +1,33 @@
 // @kagal/build-tsdoc/utils — manifest helpers
 //
 // The dependency-light companion to the root entry. Where `.` runs
-// api-extractor to *produce* manifests, this subpath holds the small
-// pure helpers for working with them — JSON serialisation matching
-// api-extractor's on-disk format, and the line-ending resolution it
-// builds on. It imports no build tooling, so a consumer can pull it
-// in without dragging api-extractor into its bundle graph.
+// api-extractor to *produce* manifests, this subpath is for working
+// with them afterwards: reading one back into the model graph
+// (`loadPackage`, which pulls only the lightweight
+// api-extractor-model), and the pure serialisation helpers matching
+// api-extractor's on-disk format (`serialiseJSON` and the line-ending
+// resolution it builds on). Neither side drags api-extractor — and
+// its bundled TypeScript compiler — into a consumer's bundle graph.
 
 import { EOL } from 'node:os';
+
+import { ApiPackage } from '@microsoft/api-extractor-model';
+
+/**
+ * Load an `ApiPackage` from a `*.api.json` manifest on disk — the
+ * read side to {@link serialiseJSON}'s write, and the inverse of the
+ * root entry's `extractEntryManifest`. File-based by necessity:
+ * api-extractor-model exposes `ApiPackage.loadFromJsonFile` but keeps
+ * its decode context (`DeserializerContext`, `ApiJsonSchemaVersion`)
+ * off the public surface, so there is no supported way to rehydrate a
+ * package from an in-memory object — only from a path. Node-only, as
+ * it reads the filesystem.
+ *
+ * @param file - Path to the `*.api.json` manifest.
+ * @returns The loaded package.
+ */
+export const loadPackage = (file: string) =>
+  ApiPackage.loadFromJsonFile(file);
 
 /**
  * Line-ending policy for the emitted manifest, mirroring

@@ -80,9 +80,10 @@ entries carry the data extraction detects from.
 
 Each entry writes
 `<projectFolder>/<outDir>/<entryName>.api.json` in
-`@microsoft/api-extractor-model`'s wire format,
-loadable with `ApiPackage.loadFromJsonFile()`. For
-finer control, call
+`@microsoft/api-extractor-model`'s wire format. Read it
+back with `loadPackage` from `@kagal/build-tsdoc/utils`,
+or `ApiPackage.loadFromJsonFile()` directly. For finer
+control, call
 `extractEntryManifest({ projectFolder, entryName })`
 yourself per entry — the hooks are a loop over it.
 
@@ -133,9 +134,27 @@ to the host default.
 ## `@kagal/build-tsdoc/utils`
 
 Dependency-light helpers for working with manifests,
-importable without pulling in api-extractor. The main
-helper is `serialiseJSON`, which formats a value as JSON
-the way api-extractor writes manifests — 2-space indent,
+importable without pulling in api-extractor — both
+reading a manifest back and writing one out.
+
+`loadPackage` reads a `*.api.json` manifest into an
+`ApiPackage`, the inverse of `extractEntryManifest`. It
+depends on `@microsoft/api-extractor-model` alone, so a
+renderer or SSR consumer can load a manifest without the
+build tooling:
+
+```typescript
+import { loadPackage } from '@kagal/build-tsdoc/utils';
+
+const pkg = loadPackage('dist/index.api.json');
+```
+
+It is file-based by necessity: api-extractor-model only
+rehydrates a package from a path, not an in-memory
+object.
+
+`serialiseJSON` formats a value as JSON the way
+api-extractor writes manifests — 2-space indent,
 trailing newline, and configurable line endings:
 
 ```typescript
@@ -150,6 +169,8 @@ The endings follow the same `NewlineKind`
 writer; `resolveNewlineKind` exposes that resolution on
 its own. The subpath exports:
 
+- `loadPackage(file)` — read a `*.api.json` manifest
+  into an `ApiPackage`
 - `serialiseJSON(value, newlineKind?)` — JSON text in
   api-extractor's manifest format
 - `resolveNewlineKind(kind?)` — resolve a `NewlineKind`
