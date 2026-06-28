@@ -11,6 +11,10 @@ documented in this file.
   pnpm override so the build and test toolchains
   resolve a single 4.x, keeping the lockfile
   deterministic.
+- Overrode `@typescript-eslint/utils` to `^8.62.0`
+  under `eslint-plugin-tsdoc` so its transitive
+  typescript-estree supports TypeScript 6.x, clearing
+  the unsupported-version warning during linting.
 
 ## [0.2.1] - 2026-06-16
 

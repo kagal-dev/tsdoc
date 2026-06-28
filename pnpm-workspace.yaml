@@ -1,4 +1,4 @@
-# cspell:words unrs esbuild rollup
+# cspell:words unrs esbuild rollup estree
 packages:
   - packages/*
 overrides:
@@ -6,6 +6,10 @@ overrides:
   # independently and drift to different patches; pin it so the lock
   # stays deterministic on a single 4.x.
   rollup: ^4.62.2
+  # eslint-plugin-tsdoc pins @typescript-eslint/utils to ~8.56.0, whose
+  # typescript-estree caps support at <6.0.0 and warns under TS 6.x.
+  # Lift just that transitive to a release that allows <6.1.0.
+  eslint-plugin-tsdoc>@typescript-eslint/utils: ^8.62.0
 ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
