@@ -21,6 +21,9 @@ documented in this file.
     `ConcreteNewlineKind` types — JSON serialisation
     matching api-extractor's manifest output (2-space
     indent, trailing newline, `NewlineKind` line endings).
+- Optional `typescript` peer dependency
+  (`^5.9.0 || ^6.0.0`) declaring the supported consumer
+  compiler range without forcing an install.
 
 ### Changed
 
