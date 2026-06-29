@@ -87,6 +87,10 @@ control, call
 `extractEntryManifest({ projectFolder, entryName })`
 yourself per entry — the hooks are a loop over it.
 
+A runnable example — a TypeScript 6.x consumer wired
+through the unbuild hooks — lives in
+[`examples/playground-ts6`](../../examples/playground-ts6).
+
 ## Defaults
 
 Paths derive from `projectFolder`, `outDir`, and

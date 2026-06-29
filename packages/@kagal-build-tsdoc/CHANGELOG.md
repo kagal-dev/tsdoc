@@ -24,6 +24,9 @@ documented in this file.
 - Optional `typescript` peer dependency
   (`^5.9.0 || ^6.0.0`) declaring the supported consumer
   compiler range without forcing an install.
+- `examples/playground-ts6` — a runnable TypeScript 6.x
+  consumer exercising extraction through the unbuild
+  hooks.
 
 ### Changed
 
