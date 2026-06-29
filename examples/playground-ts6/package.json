@@ -1,0 +1,27 @@
+{
+  "name": "@kagal/playground-ts6",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript 6.x consumer exercising @kagal/build-tsdoc extraction",
+  "scripts": {
+    "build": "unbuild",
+    "clean": "rimraf dist node_modules",
+    "dev:prepare": "unbuild --stub",
+    "lint": "eslint --fix .",
+    "lint:check": "eslint .",
+    "type-check": "run-s type-check:main type-check:tools",
+    "type-check:main": "tsc --noEmit -p tsconfig.json",
+    "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
+  },
+  "devDependencies": {
+    "@kagal/build-tsdoc": "workspace:^",
+    "@poupe/eslint-config": "^0.10.1",
+    "@types/node": "^20.19.43",
+    "eslint": "^10.5.0",
+    "npm-run-all2": "^9.0.2",
+    "rimraf": "^6.1.3",
+    "typescript": "^6.0.0",
+    "unbuild": "^3.6.1"
+  }
+}

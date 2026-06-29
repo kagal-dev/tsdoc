@@ -1,11 +1,18 @@
-# cspell:words unrs esbuild estree
+# cspell:words unrs esbuild estree unbuild
 packages:
   - packages/*
+  - examples/*
 overrides:
   # eslint-plugin-tsdoc pins @typescript-eslint/utils to ~8.56.0, whose
   # typescript-estree caps support at <6.0.0 and warns under TS 6.x.
   # Lift just that transitive to a release that allows <6.1.0.
   eslint-plugin-tsdoc>@typescript-eslint/utils: ^8.62.0
+peerDependencyRules:
+  allowedVersions:
+    # unbuild 3.6.1 (latest) caps its typescript peer at ^5.9.2; the
+    # playground example exercises the extractor under TS 6.x and builds
+    # cleanly through unbuild, so allow the wider peer.
+    unbuild>typescript: '6'
 ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
