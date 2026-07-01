@@ -30,6 +30,13 @@ documented in this file.
 
 ### Changed
 
+- Extraction now analyses declarations with the
+  consumer's installed `typescript` instead of
+  api-extractor's bundled compiler, so a package built
+  on a newer TypeScript is parsed by the engine that
+  emitted its `.d.ts` and no version-mismatch notice is
+  printed. A no-op when the consumer ships no TypeScript
+  or it already matches the bundled compiler.
 - Pinned `rollup` to `^4.62.2` through a workspace
   pnpm override so the build and test toolchains
   resolve a single 4.x, keeping the lockfile

@@ -124,6 +124,12 @@ to the host default.
   dependency is part of the package contract, so it is
   documented as a member of the package itself.
   Dependencies the entry never references are a no-op.
+- Analysis uses the consumer's installed `typescript`,
+  not api-extractor's bundled compiler: a package built
+  on a newer TypeScript is parsed by the engine that
+  emitted its declarations, so no version-mismatch
+  notice is printed. A no-op when the consumer ships no
+  TypeScript or it already matches the bundled version.
 - Throws when api-extractor reports any error. Warnings
   surface in the returned `warningCount`.
 - The bundler hooks reject duplicate entry names
