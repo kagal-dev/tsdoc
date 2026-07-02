@@ -1,3 +1,4 @@
+// cspell:words srclight
 import {
   type Config,
   defineConfig,
@@ -8,6 +9,7 @@ const config: Config[] = defineConfig(
   {
     ignores: [
       '.claude/**/memory/**',
+      '.srclight/**',
       '.tmp/**',
     ],
   },
