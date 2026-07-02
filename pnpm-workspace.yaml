@@ -1,6 +1,7 @@
-# cspell:words unrs esbuild rollup estree unbuild
+# cspell:words unrs esbuild rollup estree unbuild jiti nuxt vite mkdist
 packages:
   - packages/*
+  - packages/*/playground
   - examples/*
 overrides:
   # Our bundler and the test runner each resolve rollup `^4`
@@ -11,6 +12,9 @@ overrides:
   # typescript-estree caps support at <6.0.0 and warns under TS 6.x.
   # Lift just that transitive to a release that allows <6.1.0.
   eslint-plugin-tsdoc>@typescript-eslint/utils: ^8.62.0
+  # unbuild/untyped hold jiti at 2.6.1, the rest at 2.7.0; converge
+  # the 2.x line. `@2` spares mkdist, a separate 1.x major.
+  jiti@2: ^2.7.0
 peerDependencyRules:
   allowedVersions:
     # unbuild 3.6.1 (latest) caps its typescript peer at ^5.9.2; the

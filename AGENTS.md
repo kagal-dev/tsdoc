@@ -33,8 +33,11 @@ documentation:
   loaded package and dispatches each item to a per-kind
   view; `loadPackage()` reads a manifest from disk.
   Nuxt-agnostic — depends only on Vue.
-- **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
-  `*.api.json` manifests in Nuxt applications.
+- **`@kagal/nuxt-tsdoc`** — Nuxt module that renders
+  `*.api.json` manifests in a Nuxt app through the
+  `<APIPackage>` server island, built on
+  `@kagal/vue-tsdoc`. The manifest is loaded at prerender
+  time and the model never ships to the client.
 
 The packages form a strict one-way pipeline:
 
@@ -59,10 +62,12 @@ or any bundler. Its bundler-context interfaces
 (`UnbuildBuildHookContext`, `OBuildBuildHookContext`)
 are narrow structural shapes, never imports — the
 helpers match real bundler contexts by shape.
-`@kagal/model-tsdoc`, `@kagal/vue-tsdoc`, and
-`@kagal/nuxt-tsdoc` depend on
+`@kagal/model-tsdoc` and `@kagal/vue-tsdoc` depend on
 `@microsoft/api-extractor-model` to load and render the
-manifests.
+manifests. `@kagal/nuxt-tsdoc` depends on
+`@kagal/vue-tsdoc`, which owns `loadPackage()` and the
+`@microsoft/api-extractor-model` dependency; the module
+itself never imports the model library.
 
 ## Monorepo Structure
 

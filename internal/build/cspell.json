@@ -12,6 +12,8 @@
     "obuild",
     "poupe",
     "prepack",
+    "prerender",
+    "prerendered",
     "taistamp",
     "tsdoc",
     "unbuild"
