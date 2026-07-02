@@ -1,13 +1,23 @@
-// Shared fixture for the consumer-compiler tests: `writeSymbolProbe`
-// writes a package exporting one plain declaration, and
-// `CONSUMER_TS_ROOT` is the consumer TypeScript install the probes
-// resolve against. `CONSUMER_TS_VERSION` / `BUNDLED_TS_VERSION` expose
-// the two engines and `assertDistinctCompilers` pins the premise that
-// they differ. A probe optionally symlinks its own
-// `node_modules/typescript` at that root so the helper under test
-// resolves a genuinely different compiler as the consumer's. Each
-// consumer-compiler test lives in its own file because the analysis
-// engine is fixed at the first api-extractor load in a process.
+// Shared fixtures for the consumer-compiler tests: two probe shapes,
+// the consumer TypeScript root they resolve against, and the
+// compiler-version constants both engine-selection suites rest on.
+// The probe shapes:
+//
+//   writeSymbolProbe        — a package exporting one plain
+//                             declaration; the baseline that extracts
+//                             cleanly on either engine.
+//   writeStubReExportProbe  — a package whose entry re-exports a
+//                             symbol from a dependency shipping only a
+//                             jiti *stub* (`export * from
+//                             '../src/index.ts'`), so api-extractor
+//                             follows the re-export into raw source.
+//
+// CONSUMER_TS_VERSION and BUNDLED_TS_VERSION expose the two engines,
+// and assertDistinctCompilers pins the premise that they differ.
+//
+// The bundled- and consumer-compiler tests live in separate files
+// because the analysis engine is fixed at the first api-extractor
+// load in a process.
 import {
   mkdirSync,
   realpathSync,
@@ -139,4 +149,79 @@ export function writeSymbolProbe(
   );
   mkdirSync(path.join(dir, 'dist'));
   writeFileSync(path.join(dir, 'dist', 'index.d.mts'), declaration);
+}
+
+/**
+ * Write the stub-re-export probe into {@link workDir} and return
+ * the manifest output path. When {@link consumerTsRoot} is given,
+ * the probe gets a `node_modules/typescript` symlink to it, so the
+ * helper resolves that compiler as the consumer's.
+ */
+export function writeStubReExportProbe(
+  workDir: string,
+  consumerTsRoot?: string,
+): string {
+  if (consumerTsRoot !== undefined) {
+    linkConsumerTypeScript(workDir, consumerTsRoot);
+  }
+
+  const depDir = path.join(workDir, 'node_modules', 'probe-dep');
+  mkdirSync(path.join(depDir, 'dist'), { recursive: true });
+  mkdirSync(path.join(depDir, 'src'), { recursive: true });
+  writeFileSync(
+    path.join(depDir, 'package.json'),
+    JSON.stringify({
+      name: 'probe-dep',
+      version: '1.0.0',
+      types: './dist/index.d.mts',
+    }),
+  );
+  // the jiti stub: a declaration file re-exporting raw source
+  writeFileSync(
+    path.join(depDir, 'dist', 'index.d.mts'),
+    'export * from \'../src/index.ts\';\n',
+  );
+  // an exported function whose body unpacks an array into a local
+  // binding (`const [selector, b64Key] = parts`) — the shape
+  // of the dependency function that aborted the original publish,
+  // which api-extractor cannot determine semantic information for
+  // when followed into source.
+  writeFileSync(
+    path.join(depDir, 'src', 'index.ts'),
+    '/** Parse a "selector:base64" secret into its joined parts. */\n' +
+    'export const parseSecret = (secret: string): string => {\n' +
+    '  const parts = secret.split(\':\');\n' +
+    '  const [selector, b64Key] = parts;\n' +
+    '  if (!selector || !b64Key) {\n' +
+    '    return \'\';\n' +
+    '  }\n' +
+    '  return selector + b64Key;\n' +
+    '};\n',
+  );
+
+  mkdirSync(path.join(workDir, 'dist'));
+  writeFileSync(
+    path.join(workDir, 'dist', 'index.d.mts'),
+    'export { parseSecret } from \'probe-dep\';\n',
+  );
+  writeFileSync(
+    path.join(workDir, 'package.json'),
+    JSON.stringify({
+      name: '@kagal/main',
+      version: '0.0.0',
+      dependencies: { 'probe-dep': '1.0.0' },
+    }),
+  );
+  writeFileSync(
+    path.join(workDir, 'tsconfig.json'),
+    JSON.stringify({
+      compilerOptions: {
+        module: 'ESNext',
+        moduleResolution: 'Bundler',
+        allowImportingTsExtensions: true,
+        strict: true,
+      },
+    }),
+  );
+  return path.join(workDir, 'index.api.json');
 }
