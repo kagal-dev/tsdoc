@@ -5,6 +5,13 @@ documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Pinned `rollup` to `^4.62.2` through a workspace
+  pnpm override so the build and test toolchains
+  resolve a single 4.x, keeping the lockfile
+  deterministic.
+
 ## [0.2.1] - 2026-06-16
 
 ### Changed

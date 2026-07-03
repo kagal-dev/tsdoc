@@ -1,6 +1,11 @@
-# cspell:words unrs esbuild
+# cspell:words unrs esbuild rollup
 packages:
   - packages/*
+overrides:
+  # Our bundler and the test runner each resolve rollup `^4`
+  # independently and drift to different patches; pin it so the lock
+  # stays deterministic on a single 4.x.
+  rollup: ^4.62.2
 ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
