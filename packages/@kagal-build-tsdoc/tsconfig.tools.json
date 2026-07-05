@@ -6,6 +6,7 @@
     ]
   },
   "include": [
+    "eslint.config.ts",
     "build.config.ts",
     "vitest.config.ts"
   ]
