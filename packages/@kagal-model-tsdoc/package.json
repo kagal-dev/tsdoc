@@ -1,0 +1,79 @@
+{
+  "name": "@kagal/model-tsdoc",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Shared api-extractor-model foundation for the @kagal tsdoc family",
+  "author": "Alejandro Mery <amery@apptly.co>",
+  "license": "MIT",
+  "homepage": "https://github.com/kagal-dev/tsdoc/tree/main/packages/@kagal-model-tsdoc#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kagal-dev/tsdoc.git",
+    "directory": "packages/@kagal-model-tsdoc"
+  },
+  "bugs": {
+    "url": "https://github.com/kagal-dev/tsdoc/issues"
+  },
+  "keywords": [
+    "api-extractor-model",
+    "kagal",
+    "tsdoc"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "obuild",
+    "clean": "rimraf dist node_modules",
+    "dev": "vitest",
+    "dev:prepare": "obuild --stub",
+    "lint": "eslint --fix .",
+    "lint:_pkg-pr-new": "eslint --fix package.json",
+    "lint:check": "eslint .",
+    "precommit": "run-s dev:prepare lint type-check build test",
+    "prepack": "run-s lint:_pkg-pr-new build lint:check type-check test publint",
+    "prepare": "cross-test -s dist/index.mjs || pnpm dev:prepare",
+    "publint": "publint",
+    "publish:maybe": "npm view ${npm_package_name}@${npm_package_version} version 2>/dev/null && echo \"${npm_package_name}@${npm_package_version} already published\" || pnpm publish",
+    "test": "vitest run",
+    "test:compat": "node src/__tests__/compat.mjs",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "type-check": "run-s type-check:main type-check:tools type-check:tests",
+    "type-check:main": "tsc --noEmit -p tsconfig.json",
+    "type-check:tests": "tsc --noEmit -p tsconfig.tests.json",
+    "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
+  },
+  "devDependencies": {
+    "@kagal/build-tsdoc": "workspace:^",
+    "@kagal/cross-test": "^0.1.3",
+    "@poupe/eslint-config": "^0.10.1",
+    "@types/node": "^20.19.43",
+    "@vitest/coverage-istanbul": "^4.1.10",
+    "eslint": "^10.6.0",
+    "npm-run-all2": "^9.0.2",
+    "obuild": "^0.4.34",
+    "publint": "^0.3.21",
+    "rimraf": "^6.1.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">= 20.20.1",
+    "pnpm": ">= 10.33.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
