@@ -46,7 +46,7 @@
     "lint:check": "eslint .",
     "precommit": "run-s dev:prepare lint type-check build test",
     "prepack": "run-s lint:_pkg-pr-new build lint:check type-check test publint",
-    "prepare": "cross-test -s dist/index.mjs || unbuild --stub",
+    "prepare": "cross-test -s dist/index.mjs || pnpm dev:prepare",
     "publint": "publint",
     "publish:maybe": "npm view ${npm_package_name}@${npm_package_version} version 2>/dev/null && echo \"${npm_package_name}@${npm_package_version} already published\" || pnpm publish",
     "test": "vitest run",
