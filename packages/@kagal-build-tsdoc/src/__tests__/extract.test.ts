@@ -9,29 +9,22 @@ import {
 } from 'node:fs';
 import { EOL, tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { ApiPackage } from '@microsoft/api-extractor-model';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { extractEntryManifest } from '../extract';
 import { type NewlineKind, serialiseJSON } from '../utils';
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const PKG_DIR = path.resolve(HERE, '../..');
-const DIST_ENTRY = path.join(PKG_DIR, 'dist', 'index.d.mts');
+import {
+  assertPackageBuilt,
+  DIST_ENTRY,
+  PKG_DIR,
+} from './fixtures/built-package';
 
 describe('extractEntryManifest', () => {
   let workDir: string;
 
-  beforeAll(() => {
-    if (!existsSync(DIST_ENTRY)) {
-      throw new Error(
-        'Run `pnpm --filter @kagal/build-tsdoc build` before tests; ' +
-        `${DIST_ENTRY} is missing.`,
-      );
-    }
-  });
+  beforeAll(assertPackageBuilt);
 
   beforeEach(() => {
     workDir = mkdtempSync(
