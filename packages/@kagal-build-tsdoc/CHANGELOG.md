@@ -5,6 +5,8 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-09
+
 ### Added
 
 - `@kagal/build-tsdoc/utils` subpath — dependency-light
@@ -37,6 +39,10 @@ documented in this file.
   emitted its `.d.ts` and no version-mismatch notice is
   printed. A no-op when the consumer ships no TypeScript
   or it already matches the bundled compiler.
+- Marked the package free of side effects
+  (`"sideEffects": false`), so a consumer's bundler may
+  tree-shake unused entries — every published module body is
+  declarations and re-exports only.
 - Pinned `rollup` to `^4.62.2` through a workspace
   pnpm override so the build and test toolchains
   resolve a single 4.x, keeping the lockfile
