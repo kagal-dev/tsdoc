@@ -1,11 +1,10 @@
 import { defineBuildConfig } from 'unbuild';
 
-import { newUnbuildHooks } from './src/index';
+import { newUnbuildHooks } from '@kagal/build-tsdoc';
 
 export default defineBuildConfig({
   entries: [
     { input: 'src/index', name: 'index' },
-    { input: 'src/utils', name: 'utils' },
   ],
   declaration: true,
   sourcemap: true,

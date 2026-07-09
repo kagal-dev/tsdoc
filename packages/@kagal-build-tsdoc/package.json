@@ -30,6 +30,10 @@
     ".": {
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.mts",
+      "default": "./dist/utils.mjs"
     }
   },
   "sideEffects": false,
@@ -46,7 +50,7 @@
     "lint:check": "eslint .",
     "precommit": "run-s dev:prepare lint type-check build test",
     "prepack": "run-s lint:_pkg-pr-new build lint:check type-check test publint",
-    "prepare": "cross-test -s dist/index.mjs || unbuild --stub",
+    "prepare": "cross-test -s dist/index.mjs || pnpm dev:prepare",
     "publint": "publint",
     "publish:maybe": "npm view ${npm_package_name}@${npm_package_version} version 2>/dev/null && echo \"${npm_package_name}@${npm_package_version} already published\" || pnpm publish",
     "test": "vitest run",
@@ -74,6 +78,14 @@
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
     "vitest": "^4.1.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.0 || ^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">= 20.20.1",

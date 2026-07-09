@@ -5,6 +5,47 @@ documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `@kagal/build-tsdoc/utils` subpath — dependency-light
+  helpers for the emitted manifests, importable without
+  pulling in api-extractor:
+  - `loadPackage(file)` reads a `*.api.json` manifest
+    back into an `ApiPackage` (the api-extractor-model
+    graph), the inverse of `extractEntryManifest`. It
+    depends on `@microsoft/api-extractor-model` alone, so
+    a renderer or SSR consumer reads manifests without
+    the build tooling in its bundle graph.
+  - `serialiseJSON(value, newlineKind?)`,
+    `resolveNewlineKind`, and the `NewlineKind` /
+    `ConcreteNewlineKind` types — JSON serialisation
+    matching api-extractor's manifest output (2-space
+    indent, trailing newline, `NewlineKind` line endings).
+- Optional `typescript` peer dependency
+  (`^5.9.0 || ^6.0.0`) declaring the supported consumer
+  compiler range without forcing an install.
+- `examples/playground-ts6` — a runnable TypeScript 6.x
+  consumer exercising extraction through the unbuild
+  hooks.
+
+### Changed
+
+- Extraction now analyses declarations with the
+  consumer's installed `typescript` instead of
+  api-extractor's bundled compiler, so a package built
+  on a newer TypeScript is parsed by the engine that
+  emitted its `.d.ts` and no version-mismatch notice is
+  printed. A no-op when the consumer ships no TypeScript
+  or it already matches the bundled compiler.
+- Pinned `rollup` to `^4.62.2` through a workspace
+  pnpm override so the build and test toolchains
+  resolve a single 4.x, keeping the lockfile
+  deterministic.
+- Overrode `@typescript-eslint/utils` to `^8.62.0`
+  under `eslint-plugin-tsdoc` so its transitive
+  typescript-estree supports TypeScript 6.x, clearing
+  the unsupported-version warning during linting.
+
 ## [0.2.1] - 2026-06-16
 
 ### Changed

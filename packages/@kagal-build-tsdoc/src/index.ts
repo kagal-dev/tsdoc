@@ -4,9 +4,10 @@
 // `extractEntryManifest` once per entry to write a standard
 // `<entryName>.api.json` next to the rolled declarations. The
 // resulting file is `@microsoft/api-extractor-model`'s wire format,
-// loadable with `ApiPackage.loadFromJsonFile()`. Bundler users
-// wire the `newUnbuildHooks()` / `newOBuildHooks()` hook maps
-// instead of calling it directly.
+// loadable with `loadPackage` from `@kagal/build-tsdoc/utils` (or
+// `ApiPackage.loadFromJsonFile()` directly). Bundler users wire the
+// `newUnbuildHooks()` / `newOBuildHooks()` hook maps instead of
+// calling it directly.
 
 import pkg from '../package.json' with { type: 'json' };
 
@@ -20,7 +21,6 @@ export {
   extractEntryManifest,
   type ExtractEntryOptions,
   type ExtractEntryResult,
-  type NewlineKind,
 } from './extract';
 export {
   asOBuildContext,
@@ -36,6 +36,7 @@ export {
   type UnbuildBuildHookEntry,
   type UnbuildHooks,
 } from './unbuild';
+export type { NewlineKind } from './utils';
 
 /** Package version from package.json. */
 export const VERSION: string = pkg.version;

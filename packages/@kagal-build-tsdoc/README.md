@@ -5,6 +5,10 @@ Slim wrapper with `dist/<entryName>.*` defaults, a
 stub-aware skip, and per-bundler hook factories for
 unbuild and obuild.
 
+The root entry runs the extraction; a dependency-light
+`/utils` subpath holds helpers for working with the
+emitted manifests without pulling in api-extractor.
+
 ## Usage
 
 Each factory returns a map keyed by the bundler's own
@@ -76,11 +80,16 @@ entries carry the data extraction detects from.
 
 Each entry writes
 `<projectFolder>/<outDir>/<entryName>.api.json` in
-`@microsoft/api-extractor-model`'s wire format,
-loadable with `ApiPackage.loadFromJsonFile()`. For
-finer control, call
+`@microsoft/api-extractor-model`'s wire format. Read it
+back with `loadPackage` from `@kagal/build-tsdoc/utils`,
+or `ApiPackage.loadFromJsonFile()` directly. For finer
+control, call
 `extractEntryManifest({ projectFolder, entryName })`
 yourself per entry — the hooks are a loop over it.
+
+A runnable example — a TypeScript 6.x consumer wired
+through the unbuild hooks — lives in
+[`examples/playground-ts6`](../../examples/playground-ts6).
 
 ## Defaults
 
@@ -115,6 +124,12 @@ to the host default.
   dependency is part of the package contract, so it is
   documented as a member of the package itself.
   Dependencies the entry never references are a no-op.
+- Analysis uses the consumer's installed `typescript`,
+  not api-extractor's bundled compiler: a package built
+  on a newer TypeScript is parsed by the engine that
+  emitted its declarations, so no version-mismatch
+  notice is printed. A no-op when the consumer ships no
+  TypeScript or it already matches the bundled version.
 - Throws when api-extractor reports any error. Warnings
   surface in the returned `warningCount`.
 - The bundler hooks reject duplicate entry names
@@ -126,7 +141,60 @@ to the host default.
   `extractEntryManifest` has no list-level checks —
   callers iterating directly own any collision logic.
 
+## `@kagal/build-tsdoc/utils`
+
+Dependency-light helpers for working with manifests,
+importable without pulling in api-extractor — both
+reading a manifest back and writing one out.
+
+`loadPackage` reads a `*.api.json` manifest into an
+`ApiPackage`, the inverse of `extractEntryManifest`. It
+depends on `@microsoft/api-extractor-model` alone, so a
+renderer or SSR consumer can load a manifest without the
+build tooling:
+
+```typescript
+import { loadPackage } from '@kagal/build-tsdoc/utils';
+
+const pkg = loadPackage('dist/index.api.json');
+```
+
+It is file-based by necessity: api-extractor-model only
+rehydrates a package from a path, not an in-memory
+object.
+
+`serialiseJSON` formats a value as JSON the way
+api-extractor writes manifests — 2-space indent,
+trailing newline, and configurable line endings:
+
+```typescript
+import { serialiseJSON } from '@kagal/build-tsdoc/utils';
+
+const json = serialiseJSON(value);     // host endings
+const lf = serialiseJSON(value, 'lf');  // forced LF
+```
+
+The endings follow the same `NewlineKind`
+(`'os' | 'crlf' | 'lf'`, default host) as the manifest
+writer; `resolveNewlineKind` exposes that resolution on
+its own. The subpath exports:
+
+- `loadPackage(file)` — read a `*.api.json` manifest
+  into an `ApiPackage`
+- `serialiseJSON(value, newlineKind?)` — JSON text in
+  api-extractor's manifest format
+- `resolveNewlineKind(kind?)` — resolve a `NewlineKind`
+  to the host's concrete `'crlf' | 'lf'`
+- `NewlineKind` — line-ending policy
+  (`'os' | 'crlf' | 'lf'`)
+- `ConcreteNewlineKind` — a `NewlineKind` with `'os'`
+  resolved (`'crlf' | 'lf'`); the type
+  `resolveNewlineKind` returns
+
 ## Exports
+
+The lists below cover the root entry; the
+`@kagal/build-tsdoc/utils` subpath is documented above.
 
 ### Functions
 

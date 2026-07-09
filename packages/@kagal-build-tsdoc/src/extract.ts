@@ -1,21 +1,95 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { EOL } from 'node:os';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
+import type {
+  Extractor as ExtractorClass,
+  ExtractorConfig as ExtractorConfigClass,
+} from '@microsoft/api-extractor';
+
+import {
+  type ConcreteNewlineKind,
+  type NewlineKind,
+  resolveNewlineKind,
+  serialiseJSON,
+} from './utils';
+
+/** Runtime shape of the lazily-required `@microsoft/api-extractor`. */
+interface APIExtractorModule {
+  Extractor: typeof ExtractorClass
+  ExtractorConfig: typeof ExtractorConfigClass
+}
+
+/** `require` rooted at this module, for resolving api-extractor. */
+const requireHere = createRequire(import.meta.url);
 
 /**
- * Line-ending policy for the emitted manifest, mirroring
- * api-extractor's `newlineKind`. `'os'` writes the host's native
- * endings, `'lf'`/`'crlf'` force one regardless of platform.
+ * Resolve a package's entry from a project folder, or `undefined`
+ * when it is not installed there. Pure resolution — does not load.
  */
-export type NewlineKind = 'crlf' | 'lf' | 'os';
+function resolveFrom(
+  projectFolder: string,
+  request: string,
+): string | undefined {
+  try {
+    return createRequire(path.join(projectFolder, 'package.json'))
+      .resolve(request);
+  } catch {
+    return undefined;
+  }
+}
 
 /**
- * A {@link NewlineKind} with `'os'` already resolved to the host's
- * concrete ending — what actually drives the write.
+ * Make api-extractor analyse with the compiler the *consumer*
+ * installed — the same TypeScript that emitted the declarations —
+ * rather than the version api-extractor pins. api-extractor binds
+ * whatever `typescript` resolves from its own module, so a mismatch
+ * leaves it parsing the consumer's `.d.ts` with a foreign engine and
+ * emitting a version-mismatch notice that advises upgrading API
+ * Extractor. Aligning the engine keeps analysis on the compiler that
+ * produced the declarations and clears that notice.
+ *
+ * The alias is primed in the shared CommonJS module cache *before*
+ * api-extractor is first required, so its analyser modules capture
+ * the consumer's compiler when they evaluate `require('typescript')`
+ * at load time. A no-op when the consumer ships no TypeScript or
+ * already resolves to the same install.
  */
-type ConcreteNewlineKind = Exclude<NewlineKind, 'os'>;
+function preferConsumerTypeScript(projectFolder: string): void {
+  const consumerEntry = resolveFrom(projectFolder, 'typescript');
+  if (consumerEntry === undefined) {
+    return;
+  }
+  const aeMain = requireHere.resolve('@microsoft/api-extractor');
+  const bundledEntry = createRequire(aeMain).resolve('typescript');
+  if (bundledEntry === consumerEntry) {
+    return;
+  }
+  // Load the consumer compiler under its own path, then alias the
+  // bundled path's cache slot to that same module record so every
+  // `require('typescript')` resolving to the bundled path returns
+  // the consumer's exports.
+  requireHere(consumerEntry);
+  // A successful require always populates the cache; the guard is
+  // belt-and-braces, and skipping the alias falls back to the
+  // pinned compiler rather than crashing.
+  const consumerModule = requireHere.cache[consumerEntry];
+  if (consumerModule !== undefined) {
+    requireHere.cache[bundledEntry] = consumerModule;
+  }
+}
+
+/**
+ * Lazily load api-extractor after aliasing the consumer's
+ * TypeScript into the module cache — see
+ * {@link preferConsumerTypeScript}. The lazy load is load-bearing:
+ * a static import would evaluate api-extractor's analyser modules
+ * (and capture its pinned compiler) before the alias is in place.
+ */
+function loadAPIExtractor(projectFolder: string): APIExtractorModule {
+  preferConsumerTypeScript(projectFolder);
+  return requireHere('@microsoft/api-extractor') as APIExtractorModule;
+}
 
 /**
  * Options for {@link extractEntryManifest}. Every override is
@@ -182,45 +256,6 @@ function rewriteCanonicalReferences(
 }
 
 /**
- * Resolve the requested ending to a concrete kind that drives both
- * api-extractor's write and the import-path rewrite. Only `'lf'`
- * and `'crlf'` are honoured verbatim; `'os'`, an omitted option,
- * and any unexpected value (empty string, an untyped caller's
- * typo) all fall back to the host default. `EOL` is `'\r\n'` on
- * Windows and `'\n'` everywhere else (modern macOS included), so it
- * maps cleanly onto `'crlf'`/`'lf'`.
- */
-function resolveNewlineKind(
-  kind: NewlineKind | undefined,
-): ConcreteNewlineKind {
-  if (kind === 'lf' || kind === 'crlf') {
-    return kind;
-  }
-  return EOL === '\r\n' ? 'crlf' : 'lf';
-}
-
-/**
- * Serialise a value as JSON text the way api-extractor writes its
- * files: 2-space indent, trailing newline, and the line endings of
- * {@link newlineKind} — resolved via {@link resolveNewlineKind}, so
- * `'os'`, an omitted argument, and any unexpected value follow the
- * host. `JSON.stringify` escapes newlines within string values, so
- * the only raw breaks are structural — and the CRLF pass normalises
- * any `\r?\n` to a single `\r\n` rather than a bare `\n`→`\r\n`
- * swap, so it can never emit `\r\r\n` even if fed already-CRLF'd
- * text.
- */
-export function serialiseJSON(
-  value: unknown,
-  newlineKind?: NewlineKind,
-): string {
-  const json = JSON.stringify(value, undefined, 2) + '\n';
-  return resolveNewlineKind(newlineKind) === 'crlf' ?
-    json.replaceAll(/\r?\n/g, '\r\n') :
-    json;
-}
-
-/**
  * Disambiguate a non-default entry by grafting its name onto the
  * doc model's entry point as an import path. api-extractor emits
  * one entry point per invocation with an empty import path, so
@@ -267,6 +302,11 @@ function injectEntryImportPath(
  * declaration is documented as part of the package itself
  * rather than dropped as foreign.
  *
+ * Analysis runs on the TypeScript that the package at
+ * {@link ExtractEntryOptions.projectFolder} resolves — not the
+ * version api-extractor bundles — so declarations are parsed by
+ * the same compiler that emitted them.
+ *
  * Caller-owned: this helper handles one entry. The caller (a
  * bundler hook or a script) iterates its own entry list and
  * invokes this per entry.
@@ -295,6 +335,9 @@ export function extractEntryManifest(
   // repo normalises to and the same concrete kind feeds both the
   // extractor write and the import-path rewrite.
   const newlineKind = resolveNewlineKind(options.newlineKind);
+
+  const { Extractor, ExtractorConfig } =
+    loadAPIExtractor(options.projectFolder);
 
   const config = ExtractorConfig.prepare({
     configObject: {
