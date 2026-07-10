@@ -1,8 +1,8 @@
-import { defineBuildConfig } from 'unbuild';
+import { type BuildConfig, defineBuildConfig } from 'unbuild';
 
 import { newUnbuildHooks } from '@kagal/build-tsdoc';
 
-export default defineBuildConfig({
+const config: BuildConfig[] = defineBuildConfig({
   entries: [
     { input: 'src/index', name: 'index' },
   ],
@@ -12,3 +12,5 @@ export default defineBuildConfig({
     ...newUnbuildHooks(),
   },
 });
+
+export default config;
