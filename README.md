@@ -8,7 +8,7 @@ Monorepo for TSDoc extraction and Nuxt consumption of
 | Package | Description |
 | --- | --- |
 | [`@kagal/build-tsdoc`](packages/@kagal-build-tsdoc) | Build-hook adapter for `@microsoft/api-extractor`. Each entry's rolled declarations get a `<entry>.api.json` written next to them. |
-| [`@kagal/model-tsdoc`](packages/@kagal-model-tsdoc) | Shared `api-extractor-model` foundation: loads `*.api.json` manifests back into the model graph and carries the multi-entry contract. |
+| [`@kagal/model-tsdoc`](packages/@kagal-model-tsdoc) | Shared `api-extractor-model` foundation: loads `*.api.json` manifests back into the model graph; the multi-entry contract migrates here next. |
 | [`@kagal/nuxt-tsdoc`](packages/@kagal-nuxt-tsdoc) | Nuxt module that consumes `*.api.json` manifests produced by `@kagal/build-tsdoc`. |
 
 The packages form a pipeline: `@kagal/build-tsdoc`

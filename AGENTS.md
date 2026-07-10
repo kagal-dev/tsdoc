@@ -22,10 +22,11 @@ documentation:
 - **`@kagal/model-tsdoc`** — shared
   `api-extractor-model` foundation the consumers
   converge on: loading `*.api.json` manifests back
-  into the model graph, and the multi-entry contract
-  pairing a package's per-entry manifests with the
-  subpath each documents. Scaffold-stage: the shared
-  helpers are still migrating here from the siblings.
+  into the model graph. The read side has migrated —
+  `loadPackage`, the excerpt helpers, and the `API*`
+  model surface; the multi-entry contract, pairing a
+  package's per-entry manifests with the subpath each
+  documents, migrates here next.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
   `*.api.json` manifests in Nuxt applications.
 
@@ -36,6 +37,9 @@ package source (*.ts)
       │ extracted by
       ▼
 @kagal/build-tsdoc → dist/<entry>.api.json
+      │ loaded by
+      ▼
+@kagal/model-tsdoc → api-extractor-model graph
       │ consumed by
       ▼
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
@@ -58,12 +62,16 @@ tsdoc/
 │   │   └── src/
 │   │       ├── index.ts       # public re-exports, VERSION
 │   │       ├── extract.ts     # api-extractor invocation + option types
+│   │       ├── utils.ts       # manifest serialisation and loading helpers
 │   │       ├── errors.ts      # shared error classes
 │   │       ├── unbuild.ts     # unbuild shim + newUnbuildHooks factory
 │   │       └── obuild.ts      # obuild shim + newOBuildHooks factory
 │   ├── @kagal-model-tsdoc/    # @kagal/model-tsdoc
 │   │   └── src/
-│   │       └── index.ts       # public exports, VERSION
+│   │       ├── index.ts       # public exports, VERSION
+│   │       ├── model.ts       # API* façade over api-extractor-model
+│   │       ├── load.ts        # manifest loader
+│   │       └── excerpt.ts     # excerpt plain-text rendering
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -237,7 +245,8 @@ Temporary files use `.tmp/` with a shared prefix:
 
 Each package has multiple tsconfig files:
 
-- `tsconfig.json` — source code (no Node types)
+- `tsconfig.json` — source code (kept free of
+  Node-specific wiring by convention)
 - `tsconfig.tools.json` — adds Node types for
   `build.config.ts`, `vitest.config.ts`
 - `tsconfig.tests.json` — test files and compile-time
@@ -258,8 +267,10 @@ options (ESNext, bundler resolution, strict mode).
 ## Build
 
 - **unbuild** for most packages; `@kagal/model-tsdoc`
-  builds through **obuild**. ESM + DTS, sourcemaps
-  either way.
+  builds through **obuild**. ESM + DTS either way;
+  unbuild emits sourcemaps, obuild's sourcemaps await
+  proper integration (the naive `sourcemap` toggle
+  ships a dangling declaration-map pointer).
 - `build.config.ts` defines entry points
 - `prepare` script: `cross-test -s dist/index.mjs ||
   pnpm dev:prepare` (conditional stubbing)

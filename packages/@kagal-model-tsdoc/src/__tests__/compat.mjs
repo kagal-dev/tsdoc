@@ -7,7 +7,14 @@
 /* global console, process */
 /* eslint unicorn/no-process-exit: "off" */
 
-import { VERSION } from '../../dist/index.mjs';
+import {
+  APIItemKind,
+  APIPackage,
+  excerptText,
+  initializerText,
+  loadPackage,
+  VERSION,
+} from '../../dist/index.mjs';
 
 let failures = 0;
 
@@ -28,10 +35,31 @@ function checkString(name, value) {
   pass(name, `= '${value}'`);
 }
 
+function checkFunction(name, value) {
+  if (typeof value !== 'function') {
+    fail(name, `expected function, got ${typeof value}`);
+    return;
+  }
+  pass(name);
+}
+
+function checkObject(name, value) {
+  if (typeof value !== 'object' || value === null) {
+    fail(name, `expected object, got ${typeof value}`);
+    return;
+  }
+  pass(name);
+}
+
 console.log(`Node ${process.version}`);
 console.log(`@kagal/model-tsdoc v${VERSION}`);
 
 checkString('VERSION', VERSION);
+checkFunction('loadPackage', loadPackage);
+checkFunction('excerptText', excerptText);
+checkFunction('initializerText', initializerText);
+checkFunction('APIPackage', APIPackage);
+checkObject('APIItemKind', APIItemKind);
 
 if (failures > 0) {
   console.error(`\n${failures} failure(s)`);

@@ -7,8 +7,5 @@ export default defineBuildConfig({
   ],
   hooks: {
     ...newOBuildHooks(),
-    rolldownOutput(outConfig) {
-      outConfig.sourcemap = true;
-    },
   },
 });
