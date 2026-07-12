@@ -5,6 +5,8 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-12
+
 ### Added
 
 - The read-side surface: `loadPackage` to read a `*.api.json`

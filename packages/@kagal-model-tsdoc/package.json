@@ -1,6 +1,6 @@
 {
   "name": "@kagal/model-tsdoc",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "Shared api-extractor-model foundation for the @kagal tsdoc family",
   "author": "Alejandro Mery <amery@apptly.co>",
