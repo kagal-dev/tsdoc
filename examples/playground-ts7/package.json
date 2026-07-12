@@ -1,0 +1,24 @@
+{
+  "name": "playground-ts7",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript 7.x consumer for @kagal/build-tsdoc extraction",
+  "scripts": {
+    "build": "obuild",
+    "clean": "rimraf dist node_modules",
+    "dev:prepare": "obuild --stub",
+    "prepare": "cross-test -s dist/index.mjs || pnpm dev:prepare",
+    "type-check": "run-s type-check:main type-check:tools",
+    "type-check:main": "tsc --noEmit -p tsconfig.json",
+    "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
+  },
+  "devDependencies": {
+    "@kagal/cross-test": "^0.1.3",
+    "@types/node": "^20.19.43",
+    "npm-run-all2": "^9.0.2",
+    "obuild": "^0.4.37",
+    "rimraf": "^6.1.3",
+    "typescript": "^7.0.0"
+  }
+}
