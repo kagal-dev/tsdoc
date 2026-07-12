@@ -5,6 +5,27 @@ documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- TypeScript 7 support for consumers — the `typescript`
+  peer range widens to `^5.9.0 || ^6.0.0 || ^7.0.0`. A TS7
+  consumer's `typescript` is a version stub, not the
+  classic compiler, so its extraction runs on the bundled
+  engine deliberately (see Fixed).
+- `examples/playground-ts7` — a runnable TypeScript 7.x
+  consumer exercising extraction through the obuild hooks.
+
+### Fixed
+
+- A TypeScript 7 consumer no longer crashes extraction
+  with `ts.parseJsonConfigFileContent is not a function`.
+  The consumer-compiler swap now validates the resolved
+  `typescript` before aliasing it — adopting only a
+  compiler in the classic-API range (`>=5.9 <7`) that
+  exposes `createProgram` and `version` — so a TS7 version
+  stub is left alone and extraction falls back to the
+  bundled engine.
+
 ## [0.3.0] - 2026-07-09
 
 ### Added

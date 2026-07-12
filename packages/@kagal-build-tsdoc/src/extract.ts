@@ -40,6 +40,63 @@ function resolveFrom(
 }
 
 /**
+ * Read the version of the `typescript` the consumer resolves, via
+ * its `package.json`. Undefined when that read fails: 7.0.x exports
+ * `./package.json` explicitly while 5.9/6.0 ship no exports map, so
+ * a failed read means an install we do not recognise — treated as
+ * "version unknown" and left to the safe fallback.
+ */
+function consumerTypeScriptVersion(
+  projectFolder: string,
+): string | undefined {
+  const manifest = resolveFrom(projectFolder, 'typescript/package.json');
+  if (manifest === undefined) {
+    return undefined;
+  }
+  try {
+    const { version } = requireHere(manifest) as { version?: unknown };
+    return typeof version === 'string' ? version : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The adoptable-engine range: compilers that still expose the
+ * classic JS `ts.*` API, `>=5.9 <7`. Two-sided by design — a 4.x
+ * install is no more adoptable than TS7's native stub. This is the
+ * alias gate, deliberately narrower than the peer range (which
+ * declares who may *install* us, not what we hand api-extractor).
+ */
+function isAdoptableEngine(version: string): boolean {
+  const [major, minor] = version
+    .split('.', 2)
+    .map((part) => Number.parseInt(part, 10));
+  if (!Number.isInteger(major) || !Number.isInteger(minor)) {
+    return false;
+  }
+  if (major === 6) {
+    return true;
+  }
+  return major === 5 && minor >= 9;
+}
+
+/**
+ * Duck-type the classic compiler namespace: a genuine engine
+ * exposes `createProgram` and a `version` string. TS7's main export
+ * is a version stub with neither — and this also catches any future
+ * not-a-compiler resolution shape, not just that one.
+ */
+function exposesClassicCompiler(exports: unknown): boolean {
+  if (typeof exports !== 'object' || exports === null) {
+    return false;
+  }
+  const ts = exports as { createProgram?: unknown; version?: unknown };
+  return typeof ts.createProgram === 'function' &&
+    typeof ts.version === 'string';
+}
+
+/**
  * Make api-extractor analyse with the compiler the *consumer*
  * installed — the same TypeScript that emitted the declarations —
  * rather than the version api-extractor pins. api-extractor binds
@@ -52,8 +109,20 @@ function resolveFrom(
  * The alias is primed in the shared CommonJS module cache *before*
  * api-extractor is first required, so its analyser modules capture
  * the consumer's compiler when they evaluate `require('typescript')`
- * at load time. A no-op when the consumer ships no TypeScript or
- * already resolves to the same install.
+ * at load time. A no-op when the consumer ships no TypeScript,
+ * already resolves to the same install, or resolves an engine
+ * outside the adoptable range — a TS7 consumer's `typescript` is a
+ * version stub, not a compiler, so it is left to the bundled engine
+ * deliberately rather than grafted in to crash api-extractor.
+ *
+ * The alias is process-global and load-once: it mutates a shared
+ * module-cache slot that is never restored, and api-extractor
+ * captures whichever compiler is aliased the first time its analyser
+ * loads. One extraction process therefore serves a single consumer
+ * engine — a second consumer pinned to a different engine in the same
+ * process keeps the first. Callers run one build process per
+ * consumer, so this holds in practice; it is a constraint to
+ * preserve, not a latent bug to work around.
  */
 function preferConsumerTypeScript(projectFolder: string): void {
   const consumerEntry = resolveFrom(projectFolder, 'typescript');
@@ -65,16 +134,28 @@ function preferConsumerTypeScript(projectFolder: string): void {
   if (bundledEntry === consumerEntry) {
     return;
   }
+  // Cheap pre-check: only adopt an engine inside the adoptable
+  // range. An unknown version resolves to `undefined` and skips the
+  // alias — the safe path, falling back to the bundled compiler.
+  const version = consumerTypeScriptVersion(projectFolder);
+  if (version === undefined || !isAdoptableEngine(version)) {
+    return;
+  }
   // Load the consumer compiler under its own path, then alias the
   // bundled path's cache slot to that same module record so every
   // `require('typescript')` resolving to the bundled path returns
   // the consumer's exports.
   requireHere(consumerEntry);
-  // A successful require always populates the cache; the guard is
-  // belt-and-braces, and skipping the alias falls back to the
-  // pinned compiler rather than crashing.
+  // Belt-and-braces: a successful require always populates the
+  // cache, and the loaded module must expose the classic compiler
+  // namespace before its slot is grafted over the bundled path.
+  // Skipping the alias falls back to the pinned compiler rather
+  // than crashing.
   const consumerModule = requireHere.cache[consumerEntry];
-  if (consumerModule !== undefined) {
+  if (
+    consumerModule !== undefined &&
+    exposesClassicCompiler(consumerModule.exports)
+  ) {
     requireHere.cache[bundledEntry] = consumerModule;
   }
 }

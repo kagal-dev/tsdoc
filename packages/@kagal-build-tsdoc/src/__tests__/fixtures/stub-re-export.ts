@@ -1,6 +1,6 @@
 // Shared fixtures for the consumer-compiler tests: two probe shapes,
-// the consumer TypeScript root they resolve against, and the
-// compiler-version constants both engine-selection suites rest on.
+// the consumer TypeScript roots they resolve against, and the
+// compiler-version constants the engine-selection suites rest on.
 // The probe shapes:
 //
 //   writeSymbolProbe        — a package exporting one plain
@@ -13,7 +13,9 @@
 //                             follows the re-export into raw source.
 //
 // CONSUMER_TS_VERSION and BUNDLED_TS_VERSION expose the two engines,
-// and assertDistinctCompilers pins the premise that they differ.
+// and assertDistinctCompilers pins the premise that they differ;
+// CONSUMER_TS7_ROOT / CONSUMER_TS7_VERSION add the TS7 stub the gate
+// declines to alias, falling back to the bundled engine.
 //
 // The bundled- and consumer-compiler tests live in separate files
 // because the analysis engine is fixed at the first api-extractor
@@ -33,10 +35,6 @@ import { PKG_DIR } from './built-package';
 
 const REPO_ROOT = path.resolve(PKG_DIR, '../..');
 
-const CONSUMER_TS_PATH = path.join(
-  REPO_ROOT, 'examples', 'playground-ts6', 'node_modules', 'typescript',
-);
-
 /**
  * The workspace's TypeScript 6.x install, reached through the
  * example that pins it (its `node_modules/typescript` resolves
@@ -44,20 +42,32 @@ const CONSUMER_TS_PATH = path.join(
  * this path so the helper resolves a genuinely different compiler
  * as the consumer's.
  */
-export const CONSUMER_TS_ROOT = resolveConsumerTSRoot();
+export const CONSUMER_TS_ROOT = resolveExampleTSRoot('playground-ts6');
 
 /**
- * Resolve {@link CONSUMER_TS_PATH} to its canonical location,
- * turning a missing playground install into an actionable error
- * instead of a bare `ENOENT` when this fixture is imported.
+ * The workspace's TypeScript 7.x install, reached through
+ * `examples/playground-ts7`. Its main export is a version stub, not
+ * the classic compiler, so a probe pointing here is what the engine
+ * gate must decline to alias — falling back to the bundled compiler.
  */
-function resolveConsumerTSRoot(): string {
+export const CONSUMER_TS7_ROOT = resolveExampleTSRoot('playground-ts7');
+
+/**
+ * Resolve the `typescript` install pinned by the named example to
+ * its canonical location, turning a missing playground install into
+ * an actionable error instead of a bare `ENOENT` when this fixture
+ * is imported.
+ */
+function resolveExampleTSRoot(example: string): string {
+  const tsPath = path.join(
+    REPO_ROOT, 'examples', example, 'node_modules', 'typescript',
+  );
   try {
-    return realpathSync(CONSUMER_TS_PATH);
+    return realpathSync(tsPath);
   } catch (error) {
     throw new Error(
-      `Consumer TypeScript not found at ${CONSUMER_TS_PATH}; run ` +
-      '`pnpm install` so examples/playground-ts6 is installed before ' +
+      `Consumer TypeScript not found at ${tsPath}; run ` +
+      `\`pnpm install\` so examples/${example} is installed before ` +
       'running these tests.',
       { cause: error },
     );
@@ -73,6 +83,16 @@ const require_ = createRequire(import.meta.url);
  */
 export const CONSUMER_TS_VERSION =
   (require_(path.join(CONSUMER_TS_ROOT, 'package.json')) as {
+    version: string
+  }).version;
+
+/**
+ * The TypeScript 7.x version the ts7 example pins, read from {@link
+ * CONSUMER_TS7_ROOT}. The gate reads the same field to decide the
+ * install is outside the adoptable range and must not be aliased.
+ */
+export const CONSUMER_TS7_VERSION =
+  (require_(path.join(CONSUMER_TS7_ROOT, 'package.json')) as {
     version: string
   }).version;
 
