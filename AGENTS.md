@@ -6,7 +6,7 @@ with code in the `kagal-dev/tsdoc` monorepo.
 
 ## Project Overview
 
-This monorepo contains two MIT-licensed TypeScript
+This monorepo contains MIT-licensed TypeScript
 packages for extracting and consuming TSDoc
 documentation:
 
@@ -19,6 +19,14 @@ documentation:
   written next to its rolled declarations.
   `extractEntryManifest()` is the per-entry primitive
   for direct callers.
+- **`@kagal/model-tsdoc`** — shared
+  `api-extractor-model` foundation the consumers
+  converge on: loading `*.api.json` manifests back
+  into the model graph. The read side has migrated —
+  `loadPackage`, the excerpt helpers, and the `API*`
+  model surface; the multi-entry contract, pairing a
+  package's per-entry manifests with the subpath each
+  documents, migrates here next.
 - **`@kagal/nuxt-tsdoc`** — Nuxt module for consuming
   `*.api.json` manifests in Nuxt applications.
 
@@ -29,6 +37,9 @@ package source (*.ts)
       │ extracted by
       ▼
 @kagal/build-tsdoc → dist/<entry>.api.json
+      │ loaded by
+      ▼
+@kagal/model-tsdoc → api-extractor-model graph
       │ consumed by
       ▼
 @kagal/nuxt-tsdoc (Nuxt module) → Nuxt app
@@ -39,7 +50,7 @@ or any bundler. Its bundler-context interfaces
 (`UnbuildBuildHookContext`, `OBuildBuildHookContext`)
 are narrow structural shapes, never imports — the
 helpers match real bundler contexts by shape.
-`@kagal/nuxt-tsdoc` depends on
+`@kagal/model-tsdoc` and `@kagal/nuxt-tsdoc` depend on
 `@microsoft/api-extractor-model` to load the manifests.
 
 ## Monorepo Structure
@@ -51,9 +62,16 @@ tsdoc/
 │   │   └── src/
 │   │       ├── index.ts       # public re-exports, VERSION
 │   │       ├── extract.ts     # api-extractor invocation + option types
+│   │       ├── utils.ts       # manifest serialisation and loading helpers
 │   │       ├── errors.ts      # shared error classes
 │   │       ├── unbuild.ts     # unbuild shim + newUnbuildHooks factory
 │   │       └── obuild.ts      # obuild shim + newOBuildHooks factory
+│   ├── @kagal-model-tsdoc/    # @kagal/model-tsdoc
+│   │   └── src/
+│   │       ├── index.ts       # public exports, VERSION
+│   │       ├── model.ts       # API* façade over api-extractor-model
+│   │       ├── load.ts        # manifest loader
+│   │       └── excerpt.ts     # excerpt plain-text rendering
 │   └── @kagal-nuxt-tsdoc/     # @kagal/nuxt-tsdoc
 │       └── src/
 │           ├── index.ts       # Nuxt module entry
@@ -71,7 +89,7 @@ tsdoc/
 pnpm install
 pnpm build              # Build all packages
 pnpm clean              # Remove dist/ and node_modules
-pnpm dev:prepare        # Stub all packages (unbuild --stub)
+pnpm dev:prepare        # Stub all packages (bundler --stub)
 pnpm test               # Test all packages
 pnpm lint               # Lint all (root + packages)
 pnpm type-check         # Type-check root tools + packages
@@ -227,7 +245,8 @@ Temporary files use `.tmp/` with a shared prefix:
 
 Each package has multiple tsconfig files:
 
-- `tsconfig.json` — source code (no Node types)
+- `tsconfig.json` — source code (kept free of
+  Node-specific wiring by convention)
 - `tsconfig.tools.json` — adds Node types for
   `build.config.ts`, `vitest.config.ts`
 - `tsconfig.tests.json` — test files and compile-time
@@ -247,17 +266,23 @@ options (ESNext, bundler resolution, strict mode).
 
 ## Build
 
-- **unbuild** for all packages (ESM + DTS, sourcemaps)
+- **unbuild** for most packages; `@kagal/model-tsdoc`
+  builds through **obuild**. ESM + DTS either way;
+  unbuild emits sourcemaps, obuild's sourcemaps await
+  proper integration (the naive `sourcemap` toggle
+  ships a dangling declaration-map pointer).
 - `build.config.ts` defines entry points
 - `prepare` script: `cross-test -s dist/index.mjs ||
-  unbuild --stub` (conditional stubbing)
-- `dev:prepare`: `unbuild --stub` (unconditional)
-- `@kagal/build-tsdoc` dogfoods itself: its
-  `build.config.ts` spreads `newUnbuildHooks()` into
-  its `hooks`, so every build produces
-  `dist/<entry>.api.json` alongside the bundle. The
-  config imports from `./src/index` — jiti resolves
-  TS sources at config-load time, and the stub guard
+  pnpm dev:prepare` (conditional stubbing)
+- `dev:prepare`: `unbuild --stub` / `obuild --stub`
+  (unconditional)
+- Every package dogfoods the extraction hooks: its
+  `build.config.ts` spreads `newUnbuildHooks()` or
+  `newOBuildHooks()` into its `hooks`, so every build
+  produces `dist/<entry>.api.json` alongside the
+  bundle. In `@kagal/build-tsdoc` itself the config
+  imports from `./src/index` — jiti resolves TS
+  sources at config-load time, and the stub guard
   short-circuits the hook so `dev:prepare` never needs
   a built dist.
 
@@ -301,8 +326,7 @@ This repo has siblings under the same org:
 
 - **kagal-dev/pki** — monorepo hosting `@kagal/acme`
   (ACME protocol, RFC 8555) and `@kagal/ca` (private
-  CA engine for Cloudflare Workers). `@kagal/build-tsdoc`
-  was extracted from this repo.
+  CA engine for Cloudflare Workers).
 - **kagal-dev/kagal** — agent fleet management library
   for Cloudflare's edge.
 - **kagal-dev/cross-test** — `@kagal/cross-test`:

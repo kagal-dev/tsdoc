@@ -8,20 +8,15 @@ Monorepo for TSDoc extraction and Nuxt consumption of
 | Package | Description |
 | --- | --- |
 | [`@kagal/build-tsdoc`](packages/@kagal-build-tsdoc) | Build-hook adapter for `@microsoft/api-extractor`. Each entry's rolled declarations get a `<entry>.api.json` written next to them. |
+| [`@kagal/model-tsdoc`](packages/@kagal-model-tsdoc) | Shared `api-extractor-model` foundation: loads `*.api.json` manifests back into the model graph; the multi-entry contract migrates here next. |
 | [`@kagal/nuxt-tsdoc`](packages/@kagal-nuxt-tsdoc) | Nuxt module that consumes `*.api.json` manifests produced by `@kagal/build-tsdoc`. |
 
-The two packages form a pipeline: `@kagal/build-tsdoc`
+The packages form a pipeline: `@kagal/build-tsdoc`
 extracts documentation at package build time and ships
 `dist/<entry>.api.json` alongside the bundle;
-`@kagal/nuxt-tsdoc` is the Nuxt consumer for those
-manifests.
-
-## Origin
-
-`@kagal/build-tsdoc` was extracted from the
-[`kagal-dev/pki`](https://github.com/kagal-dev/pki)
-monorepo so it can be paired with its Nuxt consumer
-and evolve independently of the PKI codebase.
+`@kagal/model-tsdoc` loads those manifests back into
+the `api-extractor-model` graph; `@kagal/nuxt-tsdoc`
+is the Nuxt consumer for those manifests.
 
 ## Common commands
 
@@ -29,7 +24,7 @@ and evolve independently of the PKI codebase.
 pnpm install
 pnpm build              # Build all packages
 pnpm clean              # Remove dist/ and node_modules
-pnpm dev:prepare        # Stub all packages (unbuild --stub)
+pnpm dev:prepare        # Stub all packages (bundler --stub)
 pnpm test               # Test all packages
 pnpm lint               # Lint all (root + packages)
 pnpm type-check         # Type-check root tools + packages
