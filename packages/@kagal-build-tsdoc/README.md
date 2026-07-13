@@ -124,6 +124,17 @@ to the host default.
   dependency is part of the package contract, so it is
   documented as a member of the package itself.
   Dependencies the entry never references are a no-op.
+- A bundled dependency still in its development-stub
+  state — declarations re-exporting TypeScript source, as
+  `unbuild --stub` writes — is not followed into source
+  (api-extractor can only analyse declarations):
+  declarations are derived from that source with the
+  analysis compiler into
+  `node_modules/.cache/kagal-build-tsdoc/` and the
+  dependency is remapped onto them, so extraction
+  completes as if it were built. When derivation fails —
+  e.g. the source does not parse — `UnbuiltDependencyError`
+  names the dependency to build first.
 - Analysis uses the consumer's installed `typescript`,
   not api-extractor's bundled compiler: a package built
   on a newer TypeScript is parsed by the engine that
@@ -219,7 +230,7 @@ The lists below cover the root entry; the
 ### Errors
 
 - `DuplicateEntryNameError`, `HooksNotWiredError`,
-  `InvalidBuildEntryError`,
+  `InvalidBuildEntryError`, `UnbuiltDependencyError`,
   `UnrecognisedBuildContextError`
 
 ### Constant

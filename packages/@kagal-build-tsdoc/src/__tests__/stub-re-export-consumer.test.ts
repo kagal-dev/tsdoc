@@ -1,14 +1,11 @@
-// The same stub-re-export probe as stub-re-export-bundled, but with
-// the consumer's newer TypeScript resolved onto the probe, so the
-// swap runs the analysis on 6.0.3. It bounds the scope of the
-// consumer-compiler swap: following a stub into source aborts
-// identically on 6.0.3 — confirmed against the *real* construct,
-// not a proxy — so the abort is an api-extractor
-// limitation on source, not a compiler-version gap, and the swap
-// does NOT rescue it. Supporting this use case needs a separate
-// mechanism (resolve the dependency's built declaration rather than
-// follow its stub into source), tracked apart from this slice. Own
-// worker file: the engine is fixed at first api-extractor load.
+// The same stub-re-export probe as stub-re-export-bundled, but
+// with the consumer's newer TypeScript resolved onto the probe, so
+// the swap runs the analysis — and the redirect's declaration
+// derivation with it — on the consumer's 6.x engine. It bounds the
+// engine question the bundled-compiler file leaves open: the
+// redirect is engine-independent, deriving with whichever compiler
+// the analysis adopted. Own worker file: the engine is fixed at
+// the first api-extractor load in a process.
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -18,6 +15,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { extractEntryManifest } from '../extract';
 import {
   CONSUMER_TS_ROOT,
+  readEntryPointMembers,
   writeStubReExportProbe,
 } from './fixtures/stub-re-export';
 
@@ -32,11 +30,18 @@ describe('stub re-export, consumer compiler', () => {
     rmSync(workDir, { recursive: true, force: true });
   });
 
-  it('still aborts on the 6.0.3 engine — swap does not cover stubs', () => {
+  it('redirects the stub on the adopted 6.x engine too', () => {
     const outputPath = writeStubReExportProbe(workDir, CONSUMER_TS_ROOT);
-    expect(() => extractEntryManifest({
+    const result = extractEntryManifest({
       projectFolder: workDir,
       outputPath,
-    })).toThrow(/Unable to determine semantic information/);
+    });
+    expect(result).toBeDefined();
+    expect(result?.outputPath).toBe(outputPath);
+    expect(result?.warningCount).toBe(0);
+    const members = readEntryPointMembers(outputPath);
+    expect([...members.keys()]).toContain('parseSecret');
+    expect(members.get('parseSecret'))
+      .toContain('Parse a "selector:base64" secret');
   });
 });

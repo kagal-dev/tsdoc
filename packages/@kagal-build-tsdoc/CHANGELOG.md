@@ -14,6 +14,10 @@ documented in this file.
   engine deliberately (see Fixed).
 - `examples/playground-ts7` — a runnable TypeScript 7.x
   consumer exercising extraction through the obuild hooks.
+- `UnbuiltDependencyError` — thrown when a stubbed
+  dependency's declarations cannot be derived from its
+  source (see Fixed); the message names the dependency to
+  build first.
 
 ### Fixed
 
@@ -25,6 +29,16 @@ documented in this file.
   exposes `createProgram` and `version` — so a TS7 version
   stub is left alone and extraction falls back to the
   bundled engine.
+- A bundled dependency left in its development-stub state
+  (`types` re-exporting TypeScript source, as
+  `unbuild --stub` writes) no longer aborts extraction
+  with api-extractor's "Unable to determine semantic
+  information" error. Declarations are derived from the
+  stubbed source with the analysis compiler into
+  `node_modules/.cache/kagal-build-tsdoc/` and the
+  dependency is remapped onto them, so the re-exported
+  symbols are documented — TSDoc included — as if the
+  dependency were built.
 
 ## [0.3.0] - 2026-07-09
 

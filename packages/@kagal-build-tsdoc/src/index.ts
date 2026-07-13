@@ -15,6 +15,7 @@ export {
   DuplicateEntryNameError,
   HooksNotWiredError,
   InvalidBuildEntryError,
+  UnbuiltDependencyError,
   UnrecognisedBuildContextError,
 } from './errors';
 export {

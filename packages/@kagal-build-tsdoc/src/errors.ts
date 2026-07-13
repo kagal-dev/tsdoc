@@ -51,6 +51,29 @@ export class InvalidBuildEntryError extends Error {
 }
 
 /**
+ * Thrown when a bundled dependency's `types` resolves to a
+ * development stub re-exporting TypeScript source and
+ * declarations could not be derived from that source — the
+ * redirect that normally rescues a stubbed dependency needs a
+ * compilable source tree. Building the dependency first always
+ * clears it.
+ */
+export class UnbuiltDependencyError extends Error {
+  constructor(
+    public readonly dependency: string,
+    detail?: string,
+  ) {
+    super(
+      `dependency '${dependency}' resolves to stub declarations ` +
+      'and deriving built ones failed' +
+      (detail === undefined ? '' : ` (${detail})`) +
+      `; build '${dependency}' first`,
+    );
+    this.name = 'UnbuiltDependencyError';
+  }
+}
+
+/**
  * Thrown when the passed context matches no known bundler
  * shape. Surfaces misroutes at the boundary instead of as a
  * cryptic `TypeError` from the helper reading `rootDir` or

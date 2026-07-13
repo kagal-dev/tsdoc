@@ -6,7 +6,12 @@ import type {
   Extractor as ExtractorClass,
   ExtractorConfig as ExtractorConfigClass,
 } from '@microsoft/api-extractor';
+import type * as TSModule from 'typescript';
 
+import {
+  redirectStubDependencies,
+  type TypeScriptModule,
+} from './redirect';
 import {
   type ConcreteNewlineKind,
   type NewlineKind,
@@ -37,6 +42,17 @@ function resolveFrom(
   } catch {
     return undefined;
   }
+}
+
+/**
+ * The bundled compiler's entry — api-extractor's own `typescript`
+ * resolution, read through its main so it tracks that dependency's
+ * install. This is the pinned engine the alias grafts over and the
+ * analysis falls back to.
+ */
+function resolveBundledTypeScriptEntry(): string {
+  const aeMain = requireHere.resolve('@microsoft/api-extractor');
+  return createRequire(aeMain).resolve('typescript');
 }
 
 /**
@@ -129,8 +145,7 @@ function preferConsumerTypeScript(projectFolder: string): void {
   if (consumerEntry === undefined) {
     return;
   }
-  const aeMain = requireHere.resolve('@microsoft/api-extractor');
-  const bundledEntry = createRequire(aeMain).resolve('typescript');
+  const bundledEntry = resolveBundledTypeScriptEntry();
   if (bundledEntry === consumerEntry) {
     return;
   }
@@ -170,6 +185,131 @@ function preferConsumerTypeScript(projectFolder: string): void {
 function loadAPIExtractor(projectFolder: string): APIExtractorModule {
   preferConsumerTypeScript(projectFolder);
   return requireHere('@microsoft/api-extractor') as APIExtractorModule;
+}
+
+/**
+ * The compiler namespace analysis runs on: api-extractor's own
+ * `typescript` resolution, read *after* {@link loadAPIExtractor}
+ * has primed the cache — the consumer's adopted engine when the
+ * alias applied, the bundled compiler otherwise. The stub redirect
+ * derives declarations with this same engine so what it derives is
+ * what the analysis parses.
+ */
+function loadAnalysisTypeScript(): TypeScriptModule {
+  const bundledEntry = resolveBundledTypeScriptEntry();
+  return requireHere(bundledEntry) as TypeScriptModule;
+}
+
+/** Consumer tsconfig, parsed to its effective compiler options. */
+interface ParsedTSConfig {
+  /** Effective options, extends chain applied. */
+  options: TSModule.CompilerOptions
+  /** Base directory relative `paths` entries resolve against. */
+  pathsBase: string
+}
+
+/**
+ * Parse the consumer's tsconfig with the analysis engine, for the
+ * stub redirect: detection resolves modules under the consumer's
+ * effective options, and any pre-existing `paths` must survive the
+ * override merge. `undefined` when the file cannot be read or
+ * parsed — api-extractor reports that on its own terms.
+ */
+function parseConsumerTSConfig(
+  ts: TypeScriptModule,
+  tsconfigPath: string,
+): ParsedTSConfig | undefined {
+  const { config, error } =
+    ts.readConfigFile(tsconfigPath, ts.sys.readFile) as
+      { config?: unknown; error?: unknown };
+  if (error !== undefined || config === undefined) {
+    return undefined;
+  }
+  const basePath = path.dirname(tsconfigPath);
+  const parsed = ts.parseJsonConfigFileContent(config, ts.sys, basePath);
+  const pathsBase = parsed.options.pathsBasePath;
+  return {
+    options: parsed.options,
+    pathsBase: typeof pathsBase === 'string' ? pathsBase : basePath,
+  };
+}
+
+/**
+ * Merge redirect mappings over the consumer's own `paths`, making
+ * the consumer's relative entries absolute — the override's base
+ * path differs from the config the entries were written in, so
+ * only absolute entries keep their meaning across the move.
+ */
+function mergeRedirectPaths(
+  consumer: ParsedTSConfig,
+  redirects: Record<string, string[]>,
+): Record<string, string[]> {
+  const merged: Record<string, string[]> = {};
+  for (const [pattern, entries] of
+    Object.entries(consumer.options.paths ?? {})) {
+    merged[pattern] = entries.map((entry) =>
+      path.isAbsolute(entry) ?
+        entry :
+        path.resolve(consumer.pathsBase, entry));
+  }
+  return { ...merged, ...redirects };
+}
+
+/** api-extractor `compiler` configuration, either shape. */
+interface CompilerConfig {
+  overrideTsconfig?: object
+  tsconfigFilePath?: string
+}
+
+/**
+ * Compose api-extractor's `compiler` configuration: the consumer's
+ * tsconfig as-is, or — when a bundled dependency's `types` resolves
+ * to a development stub — an override extending that tsconfig with
+ * `paths` mappings that remap each stubbed dependency onto
+ * declarations derived from its source (see ./redirect), so
+ * analysis parses compiled declarations instead of following the
+ * stub into raw source.
+ *
+ * Must run after {@link loadAPIExtractor}: the redirect derives
+ * declarations with the engine the analysis will use, and that is
+ * only settled once the consumer-compiler alias has been decided.
+ *
+ * @throws UnbuiltDependencyError when a stub is detected but
+ * declarations cannot be derived from its source
+ */
+function resolveCompilerConfig(
+  projectFolder: string,
+  entryFile: string,
+  tsconfigPath: string,
+  dependencies: readonly string[],
+): CompilerConfig {
+  const passthrough = { tsconfigFilePath: tsconfigPath };
+  if (dependencies.length === 0) {
+    return passthrough;
+  }
+  const ts = loadAnalysisTypeScript();
+  const consumer = parseConsumerTSConfig(ts, tsconfigPath);
+  if (consumer === undefined) {
+    return passthrough;
+  }
+  const redirects = redirectStubDependencies({
+    compilerOptions: consumer.options,
+    dependencies,
+    entryFile,
+    projectFolder,
+    ts,
+  });
+  if (redirects === undefined) {
+    return passthrough;
+  }
+  return {
+    overrideTsconfig: {
+      extends: path.resolve(tsconfigPath),
+      compilerOptions: {
+        paths: mergeRedirectPaths(consumer, redirects),
+      },
+    },
+  };
 }
 
 /**
@@ -383,6 +523,13 @@ function injectEntryImportPath(
  * declaration is documented as part of the package itself
  * rather than dropped as foreign.
  *
+ * A bundled dependency still in its development-stub state —
+ * declarations re-exporting TypeScript source, as `unbuild --stub`
+ * writes — is not followed into source: declarations are derived
+ * from that source with the analysis compiler and the dependency
+ * is remapped onto them, so extraction completes as if it were
+ * built (see ./redirect).
+ *
  * Analysis runs on the TypeScript that the package at
  * {@link ExtractEntryOptions.projectFolder} resolves — not the
  * version api-extractor bundles — so declarations are parsed by
@@ -392,6 +539,8 @@ function injectEntryImportPath(
  * bundler hook or a script) iterates its own entry list and
  * invokes this per entry.
  *
+ * @throws UnbuiltDependencyError when a stubbed dependency's
+ * declarations cannot be derived from its source
  * @throws when api-extractor reports any error
  */
 export function extractEntryManifest(
@@ -420,13 +569,18 @@ export function extractEntryManifest(
   const { Extractor, ExtractorConfig } =
     loadAPIExtractor(options.projectFolder);
 
+  const bundledPackages = bundledPackagesFromManifest(packageFullPath);
+  const compiler = resolveCompilerConfig(
+    options.projectFolder, entryFile, tsconfigPath, bundledPackages,
+  );
+
   const config = ExtractorConfig.prepare({
     configObject: {
       projectFolder: options.projectFolder,
       mainEntryPointFilePath: entryFile,
       newlineKind,
-      bundledPackages: bundledPackagesFromManifest(packageFullPath),
-      compiler: { tsconfigFilePath: tsconfigPath },
+      bundledPackages,
+      compiler,
       docModel: { enabled: true, apiJsonFilePath: outputPath },
       apiReport: { enabled: false },
       dtsRollup: { enabled: false },
