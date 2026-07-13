@@ -5,6 +5,8 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-13
+
 ### Added
 
 - TypeScript 7 support for consumers — the `typescript`
