@@ -5,6 +5,43 @@ documented in this file.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-13
+
+### Added
+
+- TypeScript 7 support for consumers — the `typescript`
+  peer range widens to `^5.9.0 || ^6.0.0 || ^7.0.0`. A TS7
+  consumer's `typescript` is a version stub, not the
+  classic compiler, so its extraction runs on the bundled
+  engine deliberately (see Fixed).
+- `examples/playground-ts7` — a runnable TypeScript 7.x
+  consumer exercising extraction through the obuild hooks.
+- `UnbuiltDependencyError` — thrown when a stubbed
+  dependency's declarations cannot be derived from its
+  source (see Fixed); the message names the dependency to
+  build first.
+
+### Fixed
+
+- A TypeScript 7 consumer no longer crashes extraction
+  with `ts.parseJsonConfigFileContent is not a function`.
+  The consumer-compiler swap now validates the resolved
+  `typescript` before aliasing it — adopting only a
+  compiler in the classic-API range (`>=5.9 <7`) that
+  exposes `createProgram` and `version` — so a TS7 version
+  stub is left alone and extraction falls back to the
+  bundled engine.
+- A bundled dependency left in its development-stub state
+  (`types` re-exporting TypeScript source, as
+  `unbuild --stub` writes) no longer aborts extraction
+  with api-extractor's "Unable to determine semantic
+  information" error. Declarations are derived from the
+  stubbed source with the analysis compiler into
+  `node_modules/.cache/kagal-build-tsdoc/` and the
+  dependency is remapped onto them, so the re-exported
+  symbols are documented — TSDoc included — as if the
+  dependency were built.
+
 ## [0.3.0] - 2026-07-09
 
 ### Added

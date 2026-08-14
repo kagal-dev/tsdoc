@@ -1,15 +1,13 @@
 {
-  "name": "playground-ts6",
+  "name": "playground-ts7",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "TypeScript 6.x consumer exercising @kagal/build-tsdoc extraction",
+  "description": "TypeScript 7.x consumer for @kagal/build-tsdoc extraction",
   "scripts": {
-    "build": "unbuild",
+    "build": "obuild",
     "clean": "rimraf dist node_modules",
-    "dev:prepare": "unbuild --stub",
-    "lint": "eslint --fix .",
-    "lint:check": "eslint .",
+    "dev:prepare": "obuild --stub",
     "prepare": "cross-test -s dist/index.mjs || pnpm dev:prepare",
     "type-check": "run-s type-check:main type-check:tools",
     "type-check:main": "tsc --noEmit -p tsconfig.json",
@@ -18,12 +16,10 @@
   "devDependencies": {
     "@kagal/build-tsdoc": "workspace:^",
     "@kagal/cross-test": "^0.1.3",
-    "@poupe/eslint-config": "^0.10.1",
     "@types/node": "^20.19.43",
-    "eslint": "^10.6.0",
     "npm-run-all2": "^9.0.2",
+    "obuild": "^0.4.37",
     "rimraf": "^6.1.3",
-    "typescript": "^6.0.0",
-    "unbuild": "^3.6.1"
+    "typescript": "^7.0.0"
   }
 }
