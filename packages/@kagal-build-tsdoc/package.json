@@ -63,7 +63,7 @@
     "type-check:tools": "tsc --noEmit -p tsconfig.tools.json"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "^7.58.9",
+    "@microsoft/api-extractor": "^7.59.0",
     "@microsoft/api-extractor-model": "^7.33.8"
   },
   "devDependencies": {
