@@ -16,8 +16,8 @@ importers:
         specifier: ^0.10.1
         version: 0.10.1(@eslint/js@9.39.4)(@vue/compiler-sfc@3.5.32)(eslint@10.6.0(jiti@2.6.1))(typescript@5.9.3)(vue-eslint-parser@10.4.0(eslint@10.6.0(jiti@2.6.1)))
       '@types/node':
-        specifier: ^20.19.43
-        version: 20.19.43
+        specifier: ^24.13.3
+        version: 24.13.3
       cspell:
         specifier: ^10.0.1
         version: 10.0.1
@@ -38,7 +38,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@types/node@20.19.43)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
+        version: 4.1.10(@types/node@24.13.3)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
 
   examples/playground-ts6:
     devDependencies:
@@ -71,10 +71,10 @@ importers:
     dependencies:
       '@microsoft/api-extractor':
         specifier: ^7.58.9
-        version: 7.58.9(@types/node@20.19.43)
+        version: 7.58.9(@types/node@24.13.3)
       '@microsoft/api-extractor-model':
         specifier: ^7.33.8
-        version: 7.33.8(@types/node@20.19.43)
+        version: 7.33.8(@types/node@24.13.3)
     devDependencies:
       '@kagal/cross-test':
         specifier: ^0.1.3
@@ -83,8 +83,8 @@ importers:
         specifier: ^0.10.1
         version: 0.10.1(@eslint/js@9.39.4)(@vue/compiler-sfc@3.5.32)(eslint@10.6.0(jiti@2.6.1))(typescript@5.9.3)(vue-eslint-parser@10.4.0(eslint@10.6.0(jiti@2.6.1)))
       '@types/node':
-        specifier: ^20.19.43
-        version: 20.19.43
+        specifier: ^24.13.3
+        version: 24.13.3
       '@vitest/coverage-istanbul':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
@@ -108,13 +108,13 @@ importers:
         version: 3.6.1(typescript@5.9.3)
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@types/node@20.19.43)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
+        version: 4.1.10(@types/node@24.13.3)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
 
   packages/@kagal-model-tsdoc:
     dependencies:
       '@microsoft/api-extractor-model':
         specifier: ^7.33.8
-        version: 7.33.8(@types/node@20.19.43)
+        version: 7.33.8(@types/node@24.13.3)
     devDependencies:
       '@kagal/build-tsdoc':
         specifier: workspace:^
@@ -126,8 +126,8 @@ importers:
         specifier: ^0.10.1
         version: 0.10.1(@eslint/js@9.39.4)(@vue/compiler-sfc@3.5.32)(eslint@10.6.0(jiti@2.6.1))(typescript@5.9.3)(vue-eslint-parser@10.4.0(eslint@10.6.0(jiti@2.6.1)))
       '@types/node':
-        specifier: ^20.19.43
-        version: 20.19.43
+        specifier: ^24.13.3
+        version: 24.13.3
       '@vitest/coverage-istanbul':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
@@ -151,7 +151,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@types/node@20.19.43)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
+        version: 4.1.10(@types/node@24.13.3)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
 
 packages:
 
@@ -1298,6 +1298,9 @@ packages:
 
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
+
+  '@types/node@24.13.3':
+    resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -2909,6 +2912,9 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
+
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
@@ -3669,23 +3675,23 @@ snapshots:
 
   '@kagal/cross-test@0.1.3': {}
 
-  '@microsoft/api-extractor-model@7.33.8(@types/node@20.19.43)':
+  '@microsoft/api-extractor-model@7.33.8(@types/node@24.13.3)':
     dependencies:
       '@microsoft/tsdoc': 0.16.0
       '@microsoft/tsdoc-config': 0.18.1
-      '@rushstack/node-core-library': 5.23.1(@types/node@20.19.43)
+      '@rushstack/node-core-library': 5.23.1(@types/node@24.13.3)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.58.9(@types/node@20.19.43)':
+  '@microsoft/api-extractor@7.58.9(@types/node@24.13.3)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.33.8(@types/node@20.19.43)
+      '@microsoft/api-extractor-model': 7.33.8(@types/node@24.13.3)
       '@microsoft/tsdoc': 0.16.0
       '@microsoft/tsdoc-config': 0.18.1
-      '@rushstack/node-core-library': 5.23.1(@types/node@20.19.43)
+      '@rushstack/node-core-library': 5.23.1(@types/node@24.13.3)
       '@rushstack/rig-package': 0.7.3
-      '@rushstack/terminal': 0.24.0(@types/node@20.19.43)
-      '@rushstack/ts-command-line': 5.3.10(@types/node@20.19.43)
+      '@rushstack/terminal': 0.24.0(@types/node@24.13.3)
+      '@rushstack/ts-command-line': 5.3.10(@types/node@24.13.3)
       diff: 8.0.4
       minimatch: 10.2.3
       resolve: 1.22.12
@@ -3940,7 +3946,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     optional: true
 
-  '@rushstack/node-core-library@5.23.1(@types/node@20.19.43)':
+  '@rushstack/node-core-library@5.23.1(@types/node@24.13.3)':
     dependencies:
       ajv: 8.18.0
       ajv-draft-04: 1.0.0(ajv@8.18.0)
@@ -3951,28 +3957,28 @@ snapshots:
       resolve: 1.22.12
       semver: 7.7.4
     optionalDependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.3
 
-  '@rushstack/problem-matcher@0.2.1(@types/node@20.19.43)':
+  '@rushstack/problem-matcher@0.2.1(@types/node@24.13.3)':
     optionalDependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.3
 
   '@rushstack/rig-package@0.7.3':
     dependencies:
       jju: 1.4.0
       resolve: 1.22.12
 
-  '@rushstack/terminal@0.24.0(@types/node@20.19.43)':
+  '@rushstack/terminal@0.24.0(@types/node@24.13.3)':
     dependencies:
-      '@rushstack/node-core-library': 5.23.1(@types/node@20.19.43)
-      '@rushstack/problem-matcher': 0.2.1(@types/node@20.19.43)
+      '@rushstack/node-core-library': 5.23.1(@types/node@24.13.3)
+      '@rushstack/problem-matcher': 0.2.1(@types/node@24.13.3)
       supports-color: 8.1.1
     optionalDependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.3
 
-  '@rushstack/ts-command-line@5.3.10(@types/node@20.19.43)':
+  '@rushstack/ts-command-line@5.3.10(@types/node@24.13.3)':
     dependencies:
-      '@rushstack/terminal': 0.24.0(@types/node@20.19.43)
+      '@rushstack/terminal': 0.24.0(@types/node@24.13.3)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -4024,6 +4030,10 @@ snapshots:
   '@types/node@20.19.43':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/node@24.13.3':
+    dependencies:
+      undici-types: 7.18.2
 
   '@types/resolve@1.20.2': {}
 
@@ -4211,7 +4221,7 @@ snapshots:
       magicast: 0.5.2
       obug: 2.1.3
       tinyrainbow: 3.1.0
-      vitest: 4.1.10(@types/node@20.19.43)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
+      vitest: 4.1.10(@types/node@24.13.3)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -4224,13 +4234,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.10(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.10(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.10
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)
+      vite: 7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.10':
     dependencies:
@@ -6059,6 +6069,8 @@ snapshots:
 
   undici-types@6.21.0: {}
 
+  undici-types@7.18.2: {}
+
   universalify@2.0.1: {}
 
   untyped@2.0.0:
@@ -6081,7 +6093,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0):
+  vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -6090,16 +6102,16 @@ snapshots:
       rollup: 4.62.2
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.3
       fsevents: 2.3.3
       jiti: 2.6.1
       terser: 5.46.1
       yaml: 2.9.0
 
-  vitest@4.1.10(@types/node@20.19.43)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)):
+  vitest@4.1.10(@types/node@24.13.3)(@vitest/coverage-istanbul@4.1.10)(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(vite@7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.10(vite@7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.10
       '@vitest/runner': 4.1.10
       '@vitest/snapshot': 4.1.10
@@ -6116,10 +6128,10 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 7.3.2(@types/node@20.19.43)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)
+      vite: 7.3.2(@types/node@24.13.3)(jiti@2.6.1)(terser@5.46.1)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.3
       '@vitest/coverage-istanbul': 4.1.10(vitest@4.1.10)
     transitivePeerDependencies:
       - msw
