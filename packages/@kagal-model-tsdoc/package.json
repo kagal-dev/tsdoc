@@ -64,7 +64,7 @@
     "@types/node": "^20.19.43",
     "@vitest/coverage-istanbul": "^4.1.10",
     "eslint": "^10.6.0",
-    "npm-run-all2": "^9.0.2",
+    "npm-run-all2": "^9.0.3",
     "obuild": "^0.4.34",
     "publint": "^0.3.21",
     "rimraf": "^6.1.3",
