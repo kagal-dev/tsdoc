@@ -88,7 +88,7 @@
     }
   },
   "engines": {
-    "node": ">= 20.20.1",
+    "node": ">= 24.21.0",
     "pnpm": ">= 10.33.4"
   },
   "publishConfig": {
